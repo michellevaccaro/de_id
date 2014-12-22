@@ -1,0 +1,11 @@
+In de_id_functions.py:
+	Needed to install:
+		pycountry
+		pp
+		pygeoip
+	
+	changed undeclared and unused variable c to cursor in a number of functions; assumed to be a typo
+	
+in De-identification.py
+	Removed a bad space at line 515
+	

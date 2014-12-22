@@ -512,7 +512,7 @@ uMatrix - preUmatrix
 
 # <codecell>
 
- courseDrops = userKanon2(c, table, userVar, courseVar, k)
+courseDrops = userKanon2(c, table, userVar, courseVar, k)
 
 # <codecell>
 

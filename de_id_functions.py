@@ -242,7 +242,7 @@ def contSwap(cursor, tableName, varName1, varName2, th):
     """
     try: 
         addColumn(cursor,tableName,varName1+"_DI")
-        varIndex(c,tableName,varName1+"_DI")
+        varIndex(cursor,tableName,varName1+"_DI")
     except: cursor.execute("UPDATE "+tableName+" SET "+varName1+"_DI = 'NULL'")
     cursor.execute("SELECT "+varName1+", "+varName2+", SUM(Count) FROM "+tableName+" GROUP BY "+varName1)
     countries = cursor.fetchall()
@@ -379,7 +379,7 @@ def numBinner(cursor, tableName, varName, bw=5):
     if choice =='n':
         try:
             addColumn(cursor, tableName, varName+"_DI")
-            varIndex(c,tableName,varName+"_DI")
+            varIndex(cursor,tableName,varName+"_DI")
         except:
             print "column "+varName+"_DI"+" already exists, overwriting..."
             cursor.execute("UPDATE "+tableName+" SET "+varName+"_DI = "+varName)
@@ -399,7 +399,7 @@ def dateSplit(cursor, tableName, varName):
     except: pass
     try:
         addColumn(cursor,tableName,varName+"_DI")
-        varIndex(c,tableName,varName+"_DI")
+        varIndex(cursor,tableName,varName+"_DI")
     except:
         print "column "+varName+"_DI"+" already exists, overwriting..."
         cursor.execute("UPDATE "+tableName+" SET "+varName+"_DI = 'NULL'")
