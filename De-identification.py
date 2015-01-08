@@ -372,6 +372,7 @@ c = dbOpen(db)
 # <codecell>
 
 sourceLoad(c,file,table)
+c.execute('CREATE TABLE original AS SELECT * from ' + table)
 
 # <headingcell level=4>
 
@@ -379,7 +380,7 @@ sourceLoad(c,file,table)
 
 # <codecell>
 
-sourceLoad(c,file,"original")
+#sourceLoad(c,file,"original")
 
 # <headingcell level=4>
 
@@ -387,8 +388,8 @@ sourceLoad(c,file,"original")
 
 # <codecell>
 
-dateSplit(c,table,"start_time")
-dateSplit(c,table,"last_event")
+#dateSplit(c,table,"start_time")
+#dateSplit(c,table,"last_event")
 
 # <codecell>
 
@@ -443,11 +444,11 @@ contImport(c, table, "country_continent", countryVar+"_cname")
 
 # <codecell>
 
-c.execute("DELETE FROM "+table+" WHERE (roles = 'instructor' or roles = 'staff')")
+#c.execute("DELETE FROM "+table+" WHERE (roles = 'instructor' or roles = 'staff')")
 
 # <codecell>
 
-c.execute("DELETE FROM original WHERE (roles = 'instructor' or roles = 'staff')")
+#c.execute("DELETE FROM original WHERE (roles = 'instructor' or roles = 'staff')")
 
 # <headingcell level=4>
 

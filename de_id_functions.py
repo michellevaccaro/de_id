@@ -21,7 +21,7 @@
 
 
 import sqlite3, csv, os, itertools, datetime, random, string, hashlib, pygeoip
-import pycountry, pp, cPickle, math, itertools
+import pycountry, pp, cPickle, math
 from datetime import timedelta
 
 ########################
@@ -68,6 +68,16 @@ def dbClose(cursor, closeFlag=True):
 # Functions that need to be done for a new dataset, but not thereafter
 #################
 
+def splitDate(date):
+    '''
+    Remove the date from the time in the time signature while creating the main table. This replaces the call to
+    splitDate(), which took a long time.
+    '''
+    if 'T' in date:
+        point = date.index('T')
+        date = date[:point]
+    return date
+    
 def sourceLoad(cursor, fname, tableName):
     """
     cursor: sqlite3 cursor object
@@ -78,31 +88,34 @@ def sourceLoad(cursor, fname, tableName):
     """
     try:
         cursor.execute("DROP TABLE "+tableName)
+        cursor.execute("DROP TABLE original")
     except:
         pass
-    with open(fname, "r") as inFile:
+    with open(fname, "rU") as inFile:
         csvIn = csv.reader(inFile)
-        headerFlag = False
+        row = csvIn.next()
+        headers = row
+        tableCreate = "CREATE TABLE "+tableName+" ("
+        tableInsert = "INSERT INTO "+tableName+" VALUES ("
+        for col in headers[:-1]:
+            tableCreate += col+" text, "
+            tableInsert += "?,"
+        tableCreate += headers[-1]+" text, kkey text)"
+        cursor.execute(tableCreate)
+
+        tableInsert += "?, ?)"
+        #varList = qiPicker(cursor, tableName)
         for row in csvIn:
-            if not(headerFlag):
-                headers = row
-                tableCreate = "CREATE TABLE "+tableName+" ("
-                tableInsert = "INSERT INTO "+tableName+" VALUES ("
-                for col in headers[:-1]:
-                    tableCreate += col+" text, "
-                    tableInsert += "?,"
-                tableCreate += headers[-1]+" text, kkey text)"
-                tableInsert += "?, ?)"
-                cursor.execute(tableCreate)
-                #varList = qiPicker(cursor, tableName)
-                headerFlag = True
-            else:
-                row = tuple(row)
-                lastVar = ""
-                #for i in varList:
-                #    lastVar += row[int(i[0])]
-                row += (lastVar,)
-                cursor.execute(tableInsert,tuple(row))
+            if (row[25] == 'instructor') or (row[25] == 'staff' ):
+                continue
+            #for i in varList:
+            #    lastVar += row[int(i[0])]
+            row[14] = splitDate(row[14])
+            row[15] = splitDate(row[15])
+            trow = tuple(row)
+            trow += ("",)
+            cursor.execute(tableInsert, trow)
+            
     cursor.execute("ALTER TABLE "+tableName+" ADD COLUMN Count integer")
     cursor.execute("UPDATE "+tableName+" SET Count =1")
     #return varList
