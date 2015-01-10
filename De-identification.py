@@ -727,13 +727,13 @@ varList
 # <codecell>
 
 kkeyList = []
-kkeyList.append(varList[0])
-kkeyList.append(varList[36])
-kkeyList.append(varList[37])
-kkeyList.append(varList[47])
-kkeyList.append(varList[49])
-kkeyList.append(varList[50])
-kkeyList
+kkeyList.append(varList[0]) # course ID
+kkeyList.append(varList[34]) # country name DI
+kkeyList.append(varList[35]) # gender DI
+kkeyList.append(varList[44]) # LoE DI
+kkeyList.append(varList[46]) # nforum posts DI
+kkeyList.append(varList[47]) # YoB DI
+kkeyList 
 
 # <codecell>
 
@@ -747,7 +747,7 @@ qry2 = c.fetchall()
 #badCount = 0
 c.execute("UPDATE "+table+" SET kCheckFlag = 'False'")
 for row in qry2:
-    if row[0] >= 5:
+    if row[0] >= k:
         c.execute('UPDATE '+table+' SET kCheckFlag = "True" WHERE kkey = "'+row[1]+'"')
 
 # <codecell>

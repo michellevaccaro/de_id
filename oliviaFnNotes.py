@@ -1,3 +1,8 @@
+Log:
+    In De-identification.ipynb and de-identification.py:
+        -Changed line from "if row[0] >= 5" to "if row[0] >= k", to ensure k-anonymity rather than always 5-anonymity
+        -Updated kkey.append() lines in order to reflect corrected QI variable indices
+
 In de_id_functions.py:
 	# Simple SQL commands as functions
 	addColumn(cursor, tableName, varName):
