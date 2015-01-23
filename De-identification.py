@@ -362,36 +362,9 @@ k=5
 # <codecell>
 
 #choose a name for the database and then connect to it
-db = 'kaPC_1-17-4-17-14-3.db'
+db = 'firstTest.db'
 c = dbOpen(db)
 
-# <headingcell level=4>
-
-# Load data into SQLite database
-
-# <codecell>
-
-sourceLoad(c,file,table)
-c.execute('CREATE TABLE original AS SELECT * from ' + table)
-
-# <headingcell level=4>
-
-# Load data into another table to make comparisons to the original data
-
-# <codecell>
-
-#sourceLoad(c,file,"original")
-
-# <headingcell level=4>
-
-# Drop the timestamp from the date fields.
-
-# <codecell>
-
-#dateSplit(c,table,"start_time")
-#dateSplit(c,table,"last_event")
-
-# <codecell>
 
 c.execute("SELECT name FROM sqlite_master WHERE type='table';")
 c.fetchall()
@@ -456,7 +429,7 @@ contImport(c, table, "country_continent", countryVar+"_cname")
 
 # <codecell>
 
-idGen(c,table,userVar,"MHxPC13")
+#idGen(c,table,userVar,"MHxPC13")
 
 # <headingcell level=4>
 

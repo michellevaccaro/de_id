@@ -88,7 +88,6 @@ def sourceLoad(cursor, fname, tableName):
     """
     try:
         cursor.execute("DROP TABLE "+tableName)
-        cursor.execute("DROP TABLE original")
     except:
         pass
     with open(fname, "rU") as inFile:
@@ -105,6 +104,7 @@ def sourceLoad(cursor, fname, tableName):
 
         tableInsert += "?, ?)"
         #varList = qiPicker(cursor, tableName)
+        idDict = {}
         for row in csvIn:
             if (row[25] == 'instructor') or (row[25] == 'staff' ):
                 continue
@@ -112,6 +112,7 @@ def sourceLoad(cursor, fname, tableName):
             #    lastVar += row[int(i[0])]
             row[14] = splitDate(row[14])
             row[15] = splitDate(row[15])
+            row[1] = idGen2(row[1], 'MHxPC13', idDict)
             trow = tuple(row)
             trow += ("",)
             cursor.execute(tableInsert, trow)
@@ -169,6 +170,16 @@ def sortHash(inWord):
     random.seed = (os.urandom(1024))
     inWord.join(random.choice(chars) for i in range(6))
     return hashlib.sha1(inWord).hexdigest()   
+
+def idGen2(varName, prefix, lDict):
+    if varName in lDict:
+        return(lDict[varName])
+    nId = prefix + str(random.randint(0,10000000000))
+    while nId in lDict:
+        nId = prefix + str(random.randint(0,10000000000))
+    lDict[varName] = nId
+    lDict[nId] = varName
+    return nId
       
 def idGen(cursor, tableName, varName, prefix):
     """
