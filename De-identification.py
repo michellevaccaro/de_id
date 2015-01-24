@@ -357,15 +357,13 @@ table = "source"
 userVar = "user_id"
 courseVar = "course_id"
 countryVar = "final_cc"
+dbName = 'firstTest.db'
 k=5
 
 # <codecell>
 
 #choose a name for the database and then connect to it
-db = 'firstTest.db'
-c = dbOpen(db)
-
-
+c = dbOpen(dbName)
 c.execute("SELECT name FROM sqlite_master WHERE type='table';")
 c.fetchall()
 
@@ -410,26 +408,6 @@ c.fetchall()
 
 countryNamer(c,table,countryVar)
 contImport(c, table, "country_continent", countryVar+"_cname")
-
-# <headingcell level=4>
-
-# Delete staff
-
-# <codecell>
-
-#c.execute("DELETE FROM "+table+" WHERE (roles = 'instructor' or roles = 'staff')")
-
-# <codecell>
-
-#c.execute("DELETE FROM original WHERE (roles = 'instructor' or roles = 'staff')")
-
-# <headingcell level=4>
-
-# Generate anonymous userIDs, choose prefix that will describe the data release, here 'MHxPC13' refers to MITx/HarvardX Person-Course AY2013
-
-# <codecell>
-
-#idGen(c,table,userVar,"MHxPC13")
 
 # <headingcell level=4>
 
@@ -824,8 +802,7 @@ avg_age
 # <codecell>
 
 dbClose(c)
-db = 'kaPC_1-17-4-17-14-3.db'
-c = dbOpen(db)
+c = dbOpen(dbName)
 
 # <codecell>
 
