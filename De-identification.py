@@ -364,8 +364,6 @@ k=5
 
 #choose a name for the database and then connect to it
 c = dbOpen(dbName)
-c.execute("SELECT name FROM sqlite_master WHERE type='table';")
-c.fetchall()
 
 # <headingcell level=4>
 
@@ -398,16 +396,8 @@ c.execute("CREATE INDEX "+userVar+"_idx2 ON original ("+userVar+")")
 # <codecell>
 
 c.execute("SELECT SUM(Count) FROM "+table)
-c.fetchall()
+print (c.fetchall())
 
-# <headingcell level=4>
-
-# Map country codes to country names, load table of country name to continent mappings
-
-# <codecell>
-
-countryNamer(c,table,countryVar)
-contImport(c, table, "country_continent", countryVar+"_cname")
 
 # <headingcell level=4>
 
@@ -515,7 +505,9 @@ contSwap(c,table,"final_cc_cname","continent",initContVal)
 # Make gender variable that treats NA and missing as same
 
 # <codecell>
-
+'''
+replaced all of what follows with a check when the tables are created that will
+replace the "NA" gender with ""
 try:
     addColumn(c,table,"gender_DI")
     varIndex(c,table,"gender_DI")
@@ -525,7 +517,7 @@ try:
 except:
     c.execute("UPDATE "+table+" SET gender_DI = gender")
     c.execute("UPDATE "+table+" SET gender_DI = '' WHERE gender_DI = 'NA'")
-
+'''
 # <headingcell level=4>
 
 # Get k-anonymity reading

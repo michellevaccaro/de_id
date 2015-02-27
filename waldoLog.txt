@@ -3,6 +3,11 @@ Starting to build the program that will separately build the database. The thoug
 will take as arguments the .csv file that contains all of the information and the name of the database to output,
 and then create something that a version of De-identification.py can use to create a k-anonymous database.
 
+1/29/15
+Moved creation of the country/continent table to the buildDB.py function. Have started
+to find places where some information was just printed out and moved into places where
+it is only printed when a verbose option is picked.
+
 1/8/15
 Currently, every time that De-identification.py is run, it builds the whole sqlite
 database from a .csv file that contains the information on courses. This database

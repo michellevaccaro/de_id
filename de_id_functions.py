@@ -113,6 +113,8 @@ def sourceLoad(cursor, fname, tableName):
             row[14] = splitDate(row[14])
             row[15] = splitDate(row[15])
             row[1] = idGen2(row[1], 'MHxPC13', idDict)
+            if row[12] == 'NA':
+                row[12] = ''
             trow = tuple(row)
             trow += ("",)
             cursor.execute(tableInsert, trow)
