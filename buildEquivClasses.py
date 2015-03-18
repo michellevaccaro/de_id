@@ -20,6 +20,9 @@ that have fewer than a user-supplied set of entries in them.
 import operator
 import csv
 import utils
+from de_id_functions import dbOpen
+import sqlite3
+
 def buildKey(ids, dataLine):
     """
     Concatenate a set of fields together to build an overall key
@@ -37,7 +40,7 @@ def buildKey(ids, dataLine):
 
     return retKey
 
-def makeDict(ids, infile):
+def makeDictFromCSV(ids, filename):
     """
     Create and return a dictionary keyed by a concatenation of fields with value the number
     of entries containing all and only those fields.
@@ -48,8 +51,17 @@ def makeDict(ids, infile):
     the dictionary to the caller.
 
     """
+
     retDict = {}
-    for line in infile:
+    fin = open(filename, 'rU')
+    fread = csv.reader(fin)
+    fread.next()
+    fieldnames = ''
+    for i in ids:
+        fieldnames = fieldnames + i + ', '
+    print 'Using quasi-identifiers', fieldnames[:-2]
+
+    for line in fread:
         if line[12] == 'NA':
             line[12] = ''
 
@@ -58,8 +70,14 @@ def makeDict(ids, infile):
             retDict[keyAnon] += 1
         else:
             retDict[keyAnon] = 1
+    fin.close()
 
     return retDict
+
+def makeDictFromDB(idFields, fname):
+    c = dbOpen(fname)
+    c.execute('SELECT * FROM source ORDER BY user_id')
+
 
 def makeEquivDict(qidict):
     retDict = {}
@@ -83,8 +101,16 @@ if __name__ == '__main__':
     flexible mechanism for this but finding one that is not error prone is difficult.
 
     """
-    idFields = [0, 10, 11, 12, 19]
+    idFields = [0, 10, 11, 12, 19, 24]
     fname = utils.getFileName('data file to test')
+    if fname[-3:] == 'csv':
+        anonDict = makeDictFromCSV(idFields, fname)
+    elif fname[-2: ] == 'db':
+        anonDict = makeDictFromDB(idFields, fname)
+    else:
+        print 'Unknown file type; program exiting'
+        exit(1)
+
     fin = open(fname, 'rU')
     fread = csv.reader(fin)
 
