@@ -61,13 +61,10 @@ def sourceLoad(cursor, fname, tableName):
         cursor.execute(tableCreate)
 
         tableInsert += "?, ?)"
-        #varList = qiPicker(cursor, tableName)
         idDict = {}
         for row in csvIn:
             if (row[25] == 'instructor') or (row[25] == 'staff' ):
                 continue
-            #for i in varList:
-            #    lastVar += row[int(i[0])]
             row[14] = splitDate(row[14])
             row[15] = splitDate(row[15])
             row[1] = idGen2(row[1], 'MHxPC13', idDict)
@@ -79,8 +76,6 @@ def sourceLoad(cursor, fname, tableName):
 
     cursor.execute("ALTER TABLE "+tableName+" ADD COLUMN Count integer")
     cursor.execute("UPDATE "+tableName+" SET Count =1")
-    #return varList
-
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:

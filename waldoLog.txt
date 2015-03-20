@@ -1,3 +1,18 @@
+3/19/15
+Added code to buildEquivClasses.py to allow the building of the equivalence classes from a .db file as
+well as from the .csv.
+
+3/17/15
+Back to the code (although some has been generated without adding to the log). Starting by moving all of
+the code needed to build the database into buildDB.py, so that it won't clutter up the de_id_functions.py.
+Moved splitDate(), idGen2(), and sourceLoad() into the buildDB.py. Also making buildDB.py directly
+executable, which should make things easier.
+
+Added a check to buildCourseDict.py to make sure that the courses being added to the dictionary are listed in
+a canonical order (I just used dictionary order). It turns out that this makes a difference-- the concatenation
+of the classes taken by a student might differ in order only, so putting them in the same order will cut
+down on some of the uniqueness.
+
 1/21/15
 Starting to build the program that will separately build the database. The thought is to build something that
 will take as arguments the .csv file that contains all of the information and the name of the database to output,

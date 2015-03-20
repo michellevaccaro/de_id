@@ -40,28 +40,25 @@ def buildKey(ids, dataLine):
 
     return retKey
 
-def makeDictFromCSV(ids, filename):
-    """
-    Create and return a dictionary keyed by a concatenation of fields with value the number
-    of entries containing all and only those fields.
 
-    Taking a list of indexes into a line of a (csv) file and an open csv.reader(), build a
-    dictionary that is keyed by the string concatenation of the fields in the index with
-    value the number of times a line containing just those fields in those indexes occurs. Return
-    the dictionary to the caller.
-
-    """
+def makeDict(ids, inlist):
+    '''
+    Given a set of id indexes and an iterable, create a dictionary keyed by the concatenation
+    of the indexed fields with value the number of items that have the same values in those
+    fields
+    :param ids: a list of indexes to use to construct the dictionary keys
+    :param inlist:  an interable made up of indexable values
+    :return: a dictionary keyed by the concatenation of the indexed ids with value the
+        number of items having that set of values
+    '''
 
     retDict = {}
-    fin = open(filename, 'rU')
-    fread = csv.reader(fin)
-    fread.next()
     fieldnames = ''
     for i in ids:
-        fieldnames = fieldnames + i + ', '
+        fieldnames = fieldnames + str(i) + ', '
     print 'Using quasi-identifiers', fieldnames[:-2]
 
-    for line in fread:
+    for line in inlist:
         if line[12] == 'NA':
             line[12] = ''
 
@@ -70,13 +67,45 @@ def makeDictFromCSV(ids, filename):
             retDict[keyAnon] += 1
         else:
             retDict[keyAnon] = 1
+
+    return retDict
+
+
+def makeDictFromCSV(ids, filename):
+    """
+    Create and return a dictionary keyed by a concatenation of fields with value the number
+    of entries containing all and only those fields from a .csv file
+
+    Open the named file (which must be a .csv), skip the first line, and then call
+    makeDict(ids, csvReader) to create a dictionary. Return the dictionary.
+    """
+
+    fin = open(filename, 'rU')
+    fread = csv.reader(fin)
+    fread.next()
+    retDict = makeDict(ids, fread)
     fin.close()
 
     return retDict
 
 def makeDictFromDB(idFields, fname):
+    '''
+    Create and return a dictionary keyed by a concatenation of fields with value the number
+    of entries containing all and only those fields from a .db file. Open the named
+    database file (assumed to be sql lite), get the contents, and then call
+    makeDict(idFields, dbList) to create the dictionary, which is returned.
+
+    :param idFields: List of indexes of the fields to be concatenated to form the dictionary key
+    :param fname:  List of entries in the database to be used to form the dictionary
+    :return: a dictionary, keyed by the concatenation of the values of the index files, with
+        values the number of items that have those values
+    '''
+
     c = dbOpen(fname)
     c.execute('SELECT * FROM source ORDER BY user_id')
+    fulllist = c.fetchall()
+    retDict = makeDict(idFields, fulllist)
+    return retDict
 
 
 def makeEquivDict(qidict):
@@ -101,7 +130,7 @@ if __name__ == '__main__':
     flexible mechanism for this but finding one that is not error prone is difficult.
 
     """
-    idFields = [0, 10, 11, 12, 19, 24]
+    idFields = [0, 10, 11, 12, 19]
     fname = utils.getFileName('data file to test')
     if fname[-3:] == 'csv':
         anonDict = makeDictFromCSV(idFields, fname)
@@ -111,13 +140,6 @@ if __name__ == '__main__':
         print 'Unknown file type; program exiting'
         exit(1)
 
-    fin = open(fname, 'rU')
-    fread = csv.reader(fin)
-
-    l = fread.next()
-    for i in idFields:
-        print l[i]
-    anonDict = makeDict(idFields, fread)
     qiequivDict = makeEquivDict(anonDict)
 
     sortedDict = sorted(qiequivDict.iterkeys())

@@ -18,17 +18,21 @@ def buildCDict(ulist):
     ccount = dcount = itercount = 0
     for uid, cid in ulist:
         itercount += 1
-        if (oldid == uid):
+        if oldid == uid:
             dcount += 1
-            clist += cid
+            clist += ('#' + cid)
             unique = False
         elif not unique:
+            clist = makecanonical(clist)
             if clist in cdict:
                 cdict[clist].append(oldid)
             else:
                 cdict[clist] = [oldid]
                 ccount += 1
+                print clist
             unique = True
+            clist = cid
+        else :
             clist = cid
         oldid = uid
     print ccount, dcount, itercount
@@ -43,12 +47,23 @@ def parseCourseString(coursestring):
     the character '#'
     :return: A list of the course names, with the seperator character removed
     """
-    parts = coursestring.partiion('#')
+    parts = coursestring.partition('#')
     retlist = [parts[0]]
     while parts[2] != '':
         parts = parts[2].partition('#')
         retlist.append(parts[0])
     return retlist
+
+def makecanonical(coursestring):
+    clist = parseCourseString(coursestring)
+    clist.sort()
+    retstring = clist[0]
+    i = 1
+    while i < len(clist):
+        retstring += ('#' + clist[i])
+        i += 1
+    return retstring
+
 
 
 def dropClass(classlist, studentlist, classdict):
@@ -66,6 +81,6 @@ if __name__ == '__main__':
     for classlist in cdict:
         if len(cdict[classlist]) < 5:
             count += 1
-            print classlist, len(cdict[classlist]), cdict[classlist]
-            dropClass(classlist, cdict[classlist], cdict)
+            #print classlist, len(cdict[classlist]), cdict[classlist]
+            #dropClass(classlist, cdict[classlist], cdict)
     print count
