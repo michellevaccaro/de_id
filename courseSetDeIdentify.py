@@ -46,8 +46,8 @@ def buildCDict(ulist):
         else :
             clist = cid
         oldid = uid
-    print ccount, dcount, itercount
-    print len(cdict.keys())
+    # print ccount, dcount, itercount
+    # print len(cdict.keys())
     return cdict
 
 def ordercoursestring(coursestring):
@@ -212,7 +212,6 @@ if __name__ == '__main__':
     ulist = c.fetchall()
     print len(ulist)
     cdict = buildCDict(ulist)
-    #print cdict
     count = 0
     for classlist in cdict:
         if len(cdict[classlist]) < 5:
