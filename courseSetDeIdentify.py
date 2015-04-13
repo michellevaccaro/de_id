@@ -51,14 +51,16 @@ def buildCDict(ulist):
     return cdict
 
 def ordercoursestring(coursestring):
-    '''
+    """
     Take a string of terms separated by the character '#' and return a string of those terms in
-    sorted order separated by '#'. This is used to re-order a string that is the concatenation
+    sorted order separated by '#'.
+
+    This is used to re-order a string that is the concatenation
     of the courses taken by a student into a canonical form.
 
     :param coursestring: a string of terms (course names) separated by '#'
     :return: a string of terms (course names) in order, separated by '#'
-    '''
+    """
     clist = coursestringtolist(coursestring)
     clist.sort()
     return courselisttostring(clist)
@@ -83,7 +85,7 @@ def coursestringtolist(coursestring):
     return retlist
 
 def courselisttostring(courseslist):
-    '''
+    """
     Create a string of course names separated by the '#' character from a list of the course names
 
     Given a list of strings, return a single string that is the concatenation of the strings
@@ -93,8 +95,7 @@ def courselisttostring(courseslist):
 
     :param courseslist:
     :return: a string of the course names in the list, separated by the character '#'
-    '''
-
+    """
     retstring = courseslist[0]
     i = 1
     while i < len(courseslist):
