@@ -1,4 +1,17 @@
 
+4/16/15
+Simplified the code in edLevelDistribution to only have the list worked on contain the level of education. This
+is not quite as simple as it seems, since fetchall() returns a list of tuples, so the resulting list was of
+singleton tuples and so still needs to be indexed.
+
+Looked into the data and found that YoB has as possible values both 'NA' and '' for those that hadn't entered
+something. Changed buildDB.py to map YoB values of 'NA', those before 1930, and those after 2005 to the value ''.
+This will replace the suppression of records with YoB before 1930, which seemed a bit extreme.
+
+Changed the routine in edLevelDistribution that built the dictionary to be more general. It will now build
+a dictionary of values/number of records with those values from any list of singleton tuples. You can also
+pass in a filter function, which takes a value and can exchange that value for some other, based on whatever
+metric you wish. Renamed this function from buildleveldict to builddistdict.
 
 3/19/15
 Added code to buildEquivClasses.py to allow the building of the equivalence classes from a .db file as

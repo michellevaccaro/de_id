@@ -30,22 +30,32 @@ transdict = {
     'Doctorate in another field (deprecated)': 'p_oth'
 }
 
+def filteredulevel(edlevel):
+    if edlevel == '':
+        return 'NA'
+    else:
+        return edlevel
 
-def buildleveldict(studentlist):
+def builddistdict(fromlist, withfilter = None):
     """
-    Build a dictionary mapping level of education to the number of registrants at that level
+    Build a dictionary that maps from values to the number of entities in a list with those values.
 
-    This is straightforward; the only (slight) trick is that the education levels 'NA' and ''
-    (that is, left blank) are merged into a single category of 'not specified'.
-    :param studentlist: a list of student_id, level of education
-    :return: a dictionary keyed by level of education with content the number of participants who
-    reported having that level
+    This function will take a list of tuples and, looking at the first value in the tuple, will
+    build a dictionary keyed by the value with value the number of entries in the list with that value.
+    If supplied, the withfilter function, which takes a single value, can be used to replace the
+    key value with something else.
+
+    :param fromlist: a list of tuples, the first of which will be used for the distribution
+    :param withfilter: An optional filter that will take an instance of the value for distribution
+    and return a value to be used
+    :return: a dictionary, keyed by the values for the distribution, with values the number of
+    occurrences of that value in the list
     """
     retdict = {}
-    for student in studentlist:
-        level = student[1]
-        if level == '':
-            level = 'NA'
+    for entry in fromlist:
+        level = entry[0]
+        if withfilter is not None:
+            level = withfilter(level)
         if level in retdict:
             retdict[level] += 1
         else:
@@ -56,8 +66,8 @@ def buildleveldict(studentlist):
 if __name__ == '__main__':
     dbname = sys.argv[1]
     c = dbOpen(dbname)
-    c.execute('Select user_id, LoE from source')
+    c.execute('Select LoE from source')
     studentlist = c.fetchall()
-    leveldict = buildleveldict(studentlist)
+    leveldict = builddistdict(studentlist, filteredulevel)
     for description, code in transdict.items():
         print description, str(leveldict[code])

@@ -68,6 +68,8 @@ def sourceLoad(cursor, fname, tableName):
             row[14] = splitDate(row[14])
             row[15] = splitDate(row[15])
             row[1] = idGen2(row[1], 'MHxPC13', idDict)
+            if not (not (row[11] == 'NA') and not (row[11] < '1930') and not (row[11] > '2005')):
+                row[11] = ''
             if row[12] == 'NA':
                 row[12] = ''
             trow = tuple(row)
