@@ -93,7 +93,7 @@ if __name__ == '__main__':
 
     c = dbOpen(dbFileName)
     sourceLoad(c, fromFileName, 'source')
-    c.execute('CREATE TABLE original AS SELECT * from source')
+    #c.execute('CREATE TABLE original AS SELECT * from source')
 
     countryNamer(c, 'source', 'final_cc')
     contImport(c, 'source', 'country_continent', 'final_cc_cname')

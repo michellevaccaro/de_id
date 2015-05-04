@@ -5,6 +5,8 @@ __author__ = 'waldo'
 from de_id_functions import *
 import sys
 import random
+import pickle
+
 
 def buildCDict(ulist):
     """
@@ -40,15 +42,14 @@ def buildCDict(ulist):
             else:
                 cdict[clist] = [oldid]
                 ccount += 1
-                print clist
+                #print clist
             unique = True
             clist = cid
-        else :
+        else:
             clist = cid
         oldid = uid
-    # print ccount, dcount, itercount
-    # print len(cdict.keys())
     return cdict
+
 
 def ordercoursestring(coursestring):
     """
@@ -64,6 +65,7 @@ def ordercoursestring(coursestring):
     clist = coursestringtolist(coursestring)
     clist.sort()
     return courselisttostring(clist)
+
 
 def coursestringtolist(coursestring):
     """
@@ -84,6 +86,7 @@ def coursestringtolist(coursestring):
         retlist.append(parts[0])
     return retlist
 
+
 def courselisttostring(courseslist):
     """
     Create a string of course names separated by the '#' character from a list of the course names
@@ -103,6 +106,7 @@ def courselisttostring(courseslist):
         i += 1
     return retstring
 
+
 def randomdropclass(student, classlist, c):
     """
     Given a set of classes taken by a student, randomly return one of those classes.
@@ -116,9 +120,8 @@ def randomdropclass(student, classlist, c):
     :param c:  a cursor into the database
     :return: the name of a class in classlist
     """
-    clist = coursestringtolist(classlist)
-    i = random.randint(0, len(clist)-1)
-    return clist[i]
+    i = random.randint(0, len(classlist) - 1)
+    return classlist[i]
 
 
 def participationdropclass(student, classlist, c):
@@ -143,19 +146,23 @@ def participationdropclass(student, classlist, c):
     cmd = 'Select * from source where user_id = "' + student + '"'
     c.execute(cmd)
     studentrecords = c.fetchall()
-    todrop = studentrecords[0]
-    i = 1
-    while i < len(studentrecords):
-        comprec = studentrecords[i]
+    todrop = None
+    for sr in studentrecords:
+        if sr[0] not in classlist:
+            continue
+        if todrop == None:
+            todrop = sr
+            continue
+        comprec = sr
         if todrop[4] > comprec[4]:
             todrop = comprec
         elif todrop[5] > comprec[5]:
             todrop = comprec
         elif todrop[6] > comprec[6]:
             todrop = comprec
-        i += 1
 
     return todrop[0]
+
 
 def dropfromlist(todrop, oldlist):
     """
@@ -173,7 +180,22 @@ def dropfromlist(todrop, oldlist):
     return courselisttostring(clist)
 
 
-def dropClass(classlist, studentlist, classdict, c):
+def checkthreshold(cl, cldict, student):
+    if len(cl) < 2:
+        return True
+    clconcat = courselisttostring(cl)
+    if (clconcat in cldict) and (len(cldict[clconcat]) > 3):
+        return True
+    else:
+        return False
+
+
+def add2supressionlist(cl, student, slist):
+    el= cl + student
+    slist.append(el)
+    return
+
+def dropClass(classlist, studentlist, classdict, c, slist):
     """
     Given a set of classes and the students identified by that list, drop some records so that the
     students are no longer identified by the set of classes.
@@ -187,36 +209,34 @@ def dropClass(classlist, studentlist, classdict, c):
     :param c: a cursor into the database
     :return: None
     """
-    if len(classdict[classlist]) > 4:
-        return
     finddropclass = participationdropclass
+    #finddropclass = randomdropclass
+    i = 1
     for student in studentlist:
-        dropclass = finddropclass(student, classlist, c)
-        print 'dropping course', dropclass, 'for student', student
-        cmd = 'Delete from source where user_id = ' + '"' + student +'"' + 'AND course_id = ' + '"' + dropclass + '"'
-        c.execute(cmd)
-        newlist = dropfromlist(dropclass, classlist)
-        if '#' in newlist:
-            if newlist in classdict:
-                classdict[newlist].append(student)
-                if len(classdict[newlist]) < 5:
-                    dropClass(newlist, {student}, classdict, c)
-            else:
-                dropClass(newlist, {student}, classdict, c)
-
+        cl = coursestringtolist(classlist)
+        while not checkthreshold(cl, classdict, student):
+            dropclass = finddropclass(student, cl, c)
+            add2supressionlist(dropclass, student, slist)
+            cl.remove(dropclass)
     return
+
 
 if __name__ == '__main__':
     dbName = sys.argv[1]
     c = dbOpen(dbName)
+    c.execute('PRAGMA cache_size = 60000')
     c.execute('SELECT user_id, course_id FROM source ORDER BY user_id')
     ulist = c.fetchall()
-    print len(ulist)
     cdict = buildCDict(ulist)
     count = 0
+    supressionlist = []
     for classlist in cdict:
         if len(cdict[classlist]) < 5:
             count += 1
-            dropClass(classlist, cdict[classlist], cdict, c)
+            dropClass(classlist, cdict[classlist], cdict, c, supressionlist)
     print count
+    print len(supressionlist)
+    sfile = open('classSupressionList', 'w')
+    pickle.dump(supressionlist, sfile)
+    sfile.close()
     dbClose(c)
