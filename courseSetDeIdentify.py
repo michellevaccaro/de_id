@@ -224,7 +224,8 @@ def dropClass(classlist, studentlist, classdict, c, slist):
 if __name__ == '__main__':
     dbName = sys.argv[1]
     c = dbOpen(dbName)
-    c.execute('PRAGMA cache_size = 60000')
+    c.execute('PRAGMA cache_size = 300000')
+    #c.execute('Create index users on source (user_id)')
     c.execute('SELECT user_id, course_id FROM source ORDER BY user_id')
     ulist = c.fetchall()
     cdict = buildCDict(ulist)
