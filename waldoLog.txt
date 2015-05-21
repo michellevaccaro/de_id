@@ -1,3 +1,43 @@
+5/21/15
+The full toolchain is now done; we can generate a de-identified file using a technique
+that favors generalization over suppression. The only time we use suppression is if the
+set of classes uniquely identifies a student, or if the record when being written out
+contains characters that can't be written to a .csv file. We have filters for class
+suppression that will pick class/student combinations to suppress at random or based on
+favoring suppression of the classes in which the student was the least active. We also have
+ways of dynamically determining bins of a minimum size for numeric values and for
+geographic locations.
+
+The work needed now is to determine the size of the bins that will lead to a k-anonymous
+data set for various values of k. For k = 5 the bins need to be surprisingly large;
+currently values of 20,000 lead to more than 55k combinations of values in which 4 or
+fewer students reside in the bins.
+
+5/10/15
+Time to write the routine that will write out the final, de-identified .csv file.
+The fields that we want to write are
+    course_id -> course_id
+    de-identified student_id -> user_id
+    registered -> registered
+
+    viewed -> viewed
+    explored -> explored
+    certified -> certified
+    final-country or region -> final_cc_cname
+    Level of education -> LoE
+    Year of birth -> YoB
+    Gender -> gender
+    grade -> grade
+    start time -> start_time
+    last event -> last_event
+    number of events -> nevents
+    number of days active -> ndays_act
+    number of videos played -> nplay_video
+    number of chapters -> nchapters
+    number of forum posts -> nforum_posts
+    roles -> roles
+    incomplete flag -> ???
+
 
 4/16/15
 Simplified the code in edLevelDistribution to only have the list worked on contain the level of education. This

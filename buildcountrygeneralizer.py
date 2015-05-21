@@ -160,7 +160,7 @@ if __name__ == '__main__':
     country2cont = readcountrycont('country_continent')
     cont2country = buildcont2country(country2cont)
 
-    gentable, gensizetable = buildgentable(countrydist, country2cont, cont2country, 50)
+    gentable, gensizetable = buildgentable(countrydist, country2cont, cont2country, geo_binsize)
 
     outf = open(outname, 'w')
     pickle.dump(gentable, outf)

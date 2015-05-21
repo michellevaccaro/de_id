@@ -24,6 +24,12 @@ import sqlite3, csv, os, itertools, datetime, random, string, hashlib, pygeoip
 import pycountry, pp, cPickle, math
 from datetime import timedelta
 
+YoB_binsize = 30000
+nforum_post_binsize = 30000
+geo_binsize = 30000
+
+
+
 ########################
 # Simple SQL commands as functions
 #######################
@@ -53,6 +59,7 @@ def dbOpen(db):
     """
     conn = sqlite3.connect(db)
     c = conn.cursor()
+    c.execute('Pragma cache_size = 600000')
     return c
 
 def dbClose(cursor, closeFlag=True):

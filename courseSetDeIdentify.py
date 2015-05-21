@@ -209,8 +209,8 @@ def dropClass(classlist, studentlist, classdict, c, slist):
     :param c: a cursor into the database
     :return: None
     """
-    finddropclass = participationdropclass
-    #finddropclass = randomdropclass
+    #finddropclass = participationdropclass
+    finddropclass = randomdropclass
     i = 1
     for student in studentlist:
         cl = coursestringtolist(classlist)
@@ -224,8 +224,10 @@ def dropClass(classlist, studentlist, classdict, c, slist):
 if __name__ == '__main__':
     dbName = sys.argv[1]
     c = dbOpen(dbName)
-    c.execute('PRAGMA cache_size = 300000')
-    #c.execute('Create index users on source (user_id)')
+    try:
+        c.execute('Create index users on source (user_id)')
+    except:
+        pass
     c.execute('SELECT user_id, course_id FROM source ORDER BY user_id')
     ulist = c.fetchall()
     cdict = buildCDict(ulist)
