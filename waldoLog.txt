@@ -1,4 +1,13 @@
 5/21/15
+Added a generalization dictionary for level of education. There will be two categories;
+those who have finished at least a bachelor's degree (labelled 'pg') and those who have
+not or do not report (labelled 'ug'). This is done with a dictionary that is wired
+in to buildDeIddntifedCSV.py, which is not elegant but works.
+
+Added constants in the de_id_functions.py file that define the bin sizes used in the
+de-identification. These are YoB_binsize, nforum_post_binsize, and geo_binsize. These can
+be changed independently.
+
 The full toolchain is now done; we can generate a de-identified file using a technique
 that favors generalization over suppression. The only time we use suppression is if the
 set of classes uniquely identifies a student, or if the record when being written out

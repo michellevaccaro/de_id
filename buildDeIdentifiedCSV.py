@@ -31,6 +31,22 @@ wfields = ['course_id',
            'roles'
            ]
 
+loe_dict = { 'nan' : 'ug',
+             'NA': 'ug',
+             'm': 'pg',
+             'p': 'pg',
+             'b': 'pg',
+             'a': 'ug',
+             'hs': 'ug',
+             'jhs': 'ug',
+             'el': 'ug',
+             'none':'ug',
+             'other':'ug',
+             '': 'ug',
+             'p_se':'pg',
+             'p_oth': 'pg'
+             }
+
 def build_select_string(tablename):
     """
     Build a string to be used in an SQL select statement
@@ -118,6 +134,10 @@ if __name__ == '__main__':
             continue
         l = list(rec)
         l[6] = cgtable[l[6]]
+        if l[7] in loe_dict:
+            l[7] = loe_dict[l[7]]
+        else:
+            l[7] = 'ug'
         if (l[8] != ''):
             l[8] = yob_dict[l[8]]
         if l[17] != '':
