@@ -46,13 +46,13 @@ def make_count_dict(prop_dict):
 
 if __name__ == '__main__':
     if len(sys.argv) < 5:
-        print 'Useage: testkAnonDB.py databaseFile NewSuppress classSuppress geoSuppress k-anonValue'
+        print 'Useage: testkAnonDB.py databaseFile classSuppress geoSuppress NewSuppress k-anonValue'
         sys.quit(1)
 
     db_filename = sys.argv[1]
-    suppress_out = sys.argv[2]
-    cl_suppress = sys.argv[3]
-    geo_suppress = sys.argv[4]
+    cl_suppress = sys.argv[2]
+    geo_suppress = sys.argv[3]
+    suppress_out = sys.argv[4]
     k_val = int(sys.argv[5])
 
     cr = dbOpen(db_filename)

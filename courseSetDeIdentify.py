@@ -209,8 +209,8 @@ def dropClass(classlist, studentlist, classdict, c, slist):
     :param c: a cursor into the database
     :return: None
     """
-    #finddropclass = participationdropclass
-    finddropclass = randomdropclass
+    finddropclass = participationdropclass
+    #finddropclass = randomdropclass
     i = 1
     for student in studentlist:
         cl = coursestringtolist(classlist)
@@ -223,6 +223,7 @@ def dropClass(classlist, studentlist, classdict, c, slist):
 
 if __name__ == '__main__':
     dbName = sys.argv[1]
+    k_val = int(sys.argv[2])
     c = dbOpen(dbName)
     try:
         c.execute('Create index users on source (user_id)')
@@ -234,12 +235,13 @@ if __name__ == '__main__':
     count = 0
     supressionlist = []
     for classlist in cdict:
-        if len(cdict[classlist]) < 5:
+        if len(cdict[classlist]) < k_val:
             count += 1
             dropClass(classlist, cdict[classlist], cdict, c, supressionlist)
     print count
     print len(supressionlist)
-    sfile = open('classSupressionList', 'w')
+    fname = 'classSupressionListParticipation' + str(k_val)
+    sfile = open(fname, 'w')
     pickle.dump(supressionlist, sfile)
     sfile.close()
     dbClose(c)
