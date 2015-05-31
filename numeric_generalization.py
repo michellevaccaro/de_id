@@ -12,25 +12,30 @@ def findBinEndpoints(qry, maxbinsize):
    Note that if bins, for example, should be [1893-1917, 1918-1928, 1929-1931, etc.]
    then the endpoints will be: [1892,1917,1928,1931] : in other words, the endpoints of each interval.
     """
-    i = 0
+    i=0
     runningtotal = 0
-    binbreaks = [int(qry[0][0]) - 1]
-    while i < len(qry) - 1:
+    binbreaks = [int(qry[0][0])-1]
+    while i < len(qry)-1:
         runningtotal += qry[i][1]
         # if running total of bins exceeds bin size, add as endpoint and start again
-        if runningtotal >= maxbinsize:
-            try:
-                toappend = int(qry[i][0])
-            except:
-                toappend = qry[i][0]
+        # only if the remaining buckets have enough to also create a bin
+        if runningtotal >= maxbinsize and sum([x[1] for x in qry[i+1:]]) >= maxbinsize:
+            try: toappend = int(qry[i][0])
+            except: toappend = qry[i][0]
             binbreaks.append(toappend)
             runningtotal = 0
-        i = i + 1
-    try:
-        toappend = int(qry[len(qry) - 1][0])
-    except:
-        toappend = qry[len(qry) - 1][0]
-    binbreaks.append(toappend)  # append max value as the last endpoint
+        # If remaining do not have enough to make a bin, then don't add this
+        # as an endpoint and just finish up by adding the last endpoint.
+        elif runningtotal >= maxbinsize and sum([x[1] for x in qry[i+1:]]) < maxbinsize:
+            try: toappend = int(qry[len(qry)-1][0])
+            except: toappend = qry[len(qry)-1][0]
+            binbreaks.append(toappend)
+            runningtotal = 0
+            return binbreaks
+        i = i+1
+    try: toappend = int(qry[len(qry)-1][0])
+    except: toappend = qry[len(qry)-1][0]
+    binbreaks.append(toappend) # append max value as the last endpoint
     return binbreaks
 
 
