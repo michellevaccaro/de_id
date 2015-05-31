@@ -21,8 +21,8 @@
 
 
 import sqlite3, csv, os, itertools, datetime, random, string, hashlib, pygeoip
-import pycountry, pp, cPickle, math
-from datetime import timedelta
+import pycountry, cPickle, math
+#from datetime import timedelta
 
 YoB_binsize = 25000
 nforum_post_binsize = 25000
