@@ -71,7 +71,7 @@ if __name__ == '__main__':
     flexible mechanism for this but finding one that is not error prone is difficult.
 
     """
-    idFields = [0, 10, 11, 12, 19, 24]
+    idFields = [0, 6, 7, 8, 9, 17]
     fname = utils.getFileName('data file to test')
     kanon = utils.getIntVal('Enter value of k to test : ')
     full = utils.getStringVal('Enter s for summary, f for full report : ', ['s', 'f'])

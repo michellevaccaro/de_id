@@ -131,22 +131,22 @@ if __name__ == '__main__':
     for rec in rec_list:
         if rec[0]+rec[1] in csuppress:
             supressed_records += 1
-            continue
-        l = list(rec)
-        l[6] = cgtable[l[6]]
-        if l[7] in loe_dict:
-            l[7] = loe_dict[l[7]]
         else:
-            l[7] = 'ug'
-        if (l[8] != ''):
-            l[8] = yob_dict[l[8]]
-        if l[17] != '':
-            l[17] = forum_dict[l[17]]
-        try:
-            csvout.writerow(l)
-        except:
-            encoding_errors += 1
-            continue
+            l = list(rec)
+            l[6] = cgtable[l[6]]
+            if l[7] in loe_dict:
+                l[7] = loe_dict[l[7]]
+            else:
+                l[7] = 'ug'
+            if (l[8] != ''):
+                l[8] = yob_dict[l[8]]
+            if l[17] != '':
+                l[17] = forum_dict[l[17]]
+            try:
+                csvout.writerow(l)
+            except:
+                encoding_errors += 1
+                continue
 
     outf.close()
 
