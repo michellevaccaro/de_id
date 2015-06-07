@@ -190,12 +190,12 @@ def checkthreshold(cl, cldict, student):
         return False
 
 
-def add2supressionlist(cl, student, slist):
+def add2suppressionset(cl, student, s_set):
     el= cl + student
-    slist.append(el)
+    s_set.add(el)
     return
 
-def dropClass(classlist, studentlist, classdict, c, slist):
+def dropClass(classlist, studentlist, classdict, c, s_set):
     """
     Given a set of classes and the students identified by that list, drop some records so that the
     students are no longer identified by the set of classes.
@@ -209,14 +209,14 @@ def dropClass(classlist, studentlist, classdict, c, slist):
     :param c: a cursor into the database
     :return: None
     """
-    finddropclass = participationdropclass
-    #finddropclass = randomdropclass
+    #finddropclass = participationdropclass
+    finddropclass = randomdropclass
     i = 1
     for student in studentlist:
         cl = coursestringtolist(classlist)
         while not checkthreshold(cl, classdict, student):
             dropclass = finddropclass(student, cl, c)
-            add2supressionlist(dropclass, student, slist)
+            add2suppressionset(dropclass, student, s_set)
             cl.remove(dropclass)
     return
 
@@ -233,15 +233,15 @@ if __name__ == '__main__':
     ulist = c.fetchall()
     cdict = buildCDict(ulist)
     count = 0
-    supressionlist = []
+    suppressionset = set([])
     for classlist in cdict:
         if len(cdict[classlist]) < k_val:
             count += 1
-            dropClass(classlist, cdict[classlist], cdict, c, supressionlist)
+            dropClass(classlist, cdict[classlist], cdict, c, suppressionset)
     print count
-    print len(supressionlist)
-    fname = 'classSupressionListParticipation' + str(k_val)
+    print len(suppressionset)
+    fname = 'classSuppressSetR' + str(k_val)
     sfile = open(fname, 'w')
-    pickle.dump(supressionlist, sfile)
+    pickle.dump(suppressionset, sfile)
     sfile.close()
     dbClose(c)
