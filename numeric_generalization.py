@@ -104,8 +104,7 @@ def dictToTable(c, bin_dict, origVarName):
     for item in dict_list:
         c.execute("INSERT INTO " + origVarName + "_bins VALUES (?,?)", item)
 
-def main():
-    dbname = sys.argv[1]
+def main(dbname):
     c = dbOpen(dbname)
     table = 'source'
     global qry, endpts, year_conversion, nforumposts_conversion
@@ -162,4 +161,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    dbname = sys.argv[1]
+    main(dbname)
