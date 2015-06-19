@@ -154,10 +154,10 @@ def main(dbname):
     # Convert dictionary to table named YoB_bins
     dictToTable(c, nforumposts_conversion, "nforum_posts")
     # Check that the table values are correct
-    c.execute("SELECT * FROM nforum_posts_bins")
-    c.fetchall()
-    c.execute('Pragma table_info(source)')
-    print c.fetchall()
+    #c.execute("SELECT * FROM nforum_posts_bins")
+    #c.fetchall()
+    #c.execute('Pragma table_info(source)')
+    #print c.fetchall()
 
 
 if __name__ == '__main__':

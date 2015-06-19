@@ -15,11 +15,10 @@ class Participation:
     """
     Record layout for the values of the dictionary that will be created for each class
     """
-    def __init__(self):
-        registered = 0
-        viewed = 0
-        explored = 0
-        certified = 0
+    registered = 0
+    viewed = 0
+    explored = 0
+    certified = 0
 
 
 def get_percent(i, k):

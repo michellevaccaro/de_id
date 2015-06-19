@@ -101,37 +101,37 @@ def init_csv_file(fhandle):
     outf.writerow(wfields)
     return outf
 
-if __name__ == '__main__':
+
+def main(db_file_name, outname, csuppress_file_name, cg_file_name):
     """
-    The main routine, that will open the database, get the supression tables for classes,
-    and the mapping dictionaries for the various generalizers, and then create a .csv
-    file that is de-identified.
+    The main routine that will create and write the final de-identified data set
 
-    Usage: buildDeIdentifiedCSV databaseIn CSVfileOut courseSupressionFile countryGeneralizationFile
+    This method will open the database, the file containing the pickled version
+    of the courses to suppress, and the country generalization file. It will then
+    write a .csv file with the name supplied that contains all of the records
+    that are not to be suppressed, with the generalized values that will give
+    the de-identification.
+    :param db_file_name: name of the file containing the database to be converted to csv
+    :param outname:  name of the csv file to be produced
+    :param csuppress_file_name: file containing a pickled version of the set of course/student
+    records to be suppressed
+    :param cg_file_name: file containing the pickled version of the dictionary mapping
+    from country to region (if needed) for anonymization
+    :return: None
     """
-
-    if len(sys.argv) < 5:
-        print 'Usage: buildDeIdentifiedCSV databaseIn CSVfileOut courseSupressionFile countryGeneralizationFile'
-        sys.exit(1)
-
-    c = dbOpen(sys.argv[1])
-    outname = sys.argv[2]
+    c = dbOpen(db_file_name)
     outf = open(outname, 'w')
     csvout = init_csv_file(outf)
-
-    csuppress = get_pickled_table(sys.argv[3])
-    cgtable = get_pickled_table(sys.argv[4])
+    csuppress = get_pickled_table(csuppress_file_name)
+    cgtable = get_pickled_table(cg_file_name)
     yob_dict = build_numeric_dict(c, 'YoB_bins')
     forum_dict = build_numeric_dict(c, 'nforum_posts_bins')
-
     c.execute(build_select_string('source'))
     rec_list = c.fetchall()
-    supressed_records = 0
+    supressed_records = len(csuppress)
     encoding_errors = 0
     for rec in rec_list:
-        if rec[0]+rec[1] in csuppress:
-            supressed_records += 1
-        else:
+        if rec[0] + rec[1] not in csuppress:
             l = list(rec)
             l[6] = cgtable[l[6]]
             if l[7] in loe_dict:
@@ -147,9 +147,25 @@ if __name__ == '__main__':
             except:
                 encoding_errors += 1
                 continue
-
     outf.close()
-
-
     print 'number of records suppressed for k-anonymity =', supressed_records
     print 'number of records supressed for encoding issues =', encoding_errors
+
+
+if __name__ == '__main__':
+    """
+    The main routine, that will get the names of the files needed for the creation
+    of the de-identified csv file, and pass those names on to the main() routine,
+    which does all of the actual work.
+
+    Usage: buildDeIdentifiedCSV databaseIn CSVfileOut courseSupressionFile countryGeneralizationFile
+    """
+    if len(sys.argv) < 5:
+        print 'Usage: buildDeIdentifiedCSV databaseIn CSVfileOut courseSupressionFile countryGeneralizationFile'
+        sys.exit(1)
+    db_file_name = sys.argv[1]
+    outname = sys.argv[2]
+    csuppress_file_name = sys.argv[3]
+    cg_file_name = sys.argv[4]
+
+    main(db_file_name, outname, csuppress_file_name, cg_file_name)

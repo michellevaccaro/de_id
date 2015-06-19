@@ -84,7 +84,7 @@ and then create something that a version of De-identification.py can use to crea
 
 1/29/15
 Moved creation of the country/continent table to the buildDB.py function. Have started
-to find places where some information was just printed out and moved into places where
+to find places whereC some information was just printed out and moved into places where
 it is only printed when a verbose option is picked.
 
 1/8/15

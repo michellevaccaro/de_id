@@ -24,9 +24,9 @@ import sqlite3, csv, os, itertools, datetime, random, string, hashlib, pygeoip
 import pycountry, cPickle, math
 #from datetime import timedelta
 
-YoB_binsize = 25000
-nforum_post_binsize = 25000
-geo_binsize = 25000
+YoB_binsize = 3000
+nforum_post_binsize = 3000
+geo_binsize = 3000
 
 
 
@@ -74,7 +74,6 @@ def dbClose(cursor, closeFlag=True):
 ##################
 # Functions that need to be done for a new dataset, but not thereafter
 #################
-
 
 def countryNamer(cursor, tableName, countryCode):
     """

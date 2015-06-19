@@ -145,19 +145,20 @@ def printtables(countrydist, gentable, gensizetable):
         print country, value
 
 if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        print 'Usage: buildcountrygeneralizer databaseFile outputFile {p}'
+    if len(sys.argv) < 4:
+        print 'Usage: buildcountrygeneralizer databaseFile outputFile country_to_continent_file {p}'
         exit(1)
 
     dbname = sys.argv[1]
     outname = sys.argv[2]
+    ccfname = sys.argv[3]
 
     c = dbOpen(dbname)
     c.execute('Select final_cc_cname from source')
     countries = c.fetchall()
 
     countrydist = builddistdict(countries)
-    country2cont = readcountrycont('country_continent')
+    country2cont = readcountrycont('../country_continent')
     cont2country = buildcont2country(country2cont)
 
     gentable, gensizetable = buildgentable(countrydist, country2cont, cont2country, geo_binsize)
@@ -166,6 +167,6 @@ if __name__ == '__main__':
     pickle.dump(gentable, outf)
     outf.close()
 
-    if (len(sys.argv) > 3) and (sys.argv[3] == 'p'):
+    if (len(sys.argv) > 4) and (sys.argv[4] == 'p'):
         printtables(countrydist, gentable, gensizetable)
 
