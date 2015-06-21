@@ -195,7 +195,7 @@ def add2suppressionset(cl, student, s_set):
     s_set.add(el)
     return
 
-def dropClass(classlist, studentlist, classdict, c, s_set):
+def dropClass(classlist, studentlist, classdict, c, s_set, finddropclass):
     """
     Given a set of classes and the students identified by that list, drop some records so that the
     students are no longer identified by the set of classes.
@@ -207,10 +207,9 @@ def dropClass(classlist, studentlist, classdict, c, s_set):
     :param studentlist: a list of students who are identified by that set of classes
     :param classdict: the dictionary of class combinations and students taking that combination of classes
     :param c: a cursor into the database
+    :param finddropclass: method used to decide which classes to drop
     :return: None
     """
-    #finddropclass = participationdropclass
-    finddropclass = randomdropclass
     i = 1
     for student in studentlist:
         cl = coursestringtolist(classlist)
@@ -221,9 +220,15 @@ def dropClass(classlist, studentlist, classdict, c, s_set):
     return
 
 
-if __name__ == '__main__':
-    dbName = sys.argv[1]
-    k_val = int(sys.argv[2])
+def main(dbName, k_val, suppress_method):
+    fname = str(k_val)
+    if suppress_method == 'R':
+        use_suppress = randomdropclass
+        fname = 'classSuppressSetR'+ fname
+    else :
+        use_suppress = participationdropclass
+        fname = 'classSuppressSetP'+ fname
+
     c = dbOpen(dbName)
     try:
         c.execute('Create index users on source (user_id)')
@@ -237,11 +242,23 @@ if __name__ == '__main__':
     for classlist in cdict:
         if len(cdict[classlist]) < k_val:
             count += 1
-            dropClass(classlist, cdict[classlist], cdict, c, suppressionset)
+            dropClass(classlist, cdict[classlist], cdict, c, suppressionset, use_suppress)
     print count
     print len(suppressionset)
-    fname = 'classSuppressSetR' + str(k_val)
     sfile = open(fname, 'w')
     pickle.dump(suppressionset, sfile)
     sfile.close()
     dbClose(c)
+
+
+if __name__ == '__main__':
+    if len(sys.argv) < 3:
+        print 'Usage: courseSetDeidentify.py dbname k-value {P,R}'
+        print 'where P is suppression on level of participation and R is random'
+    dbName = sys.argv[1]
+    k_val = int(sys.argv[2])
+    suppress_method = 'P'
+    if sys.argv[3] == 'R':
+        suppress_method = 'R'
+
+    main(dbName, k_val, suppress_method)

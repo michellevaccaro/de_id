@@ -77,6 +77,35 @@ def make_count_dict(prop_dict):
             ret_dict[l].append(k)
     return ret_dict
 
+
+def main(db_filename, cl_suppress, geo_suppress, suppress_out, k_val):
+    cr = dbOpen(db_filename)
+    yob_gentable = build_numeric_dict(cr, 'YoB_bins')
+    forum_gentable = build_numeric_dict(cr, 'nforum_posts_bins')
+    cgtable = get_pickled_table(geo_suppress)
+    class_suppress = get_pickled_table(cl_suppress)
+    prop_dict = make_list_dict(cr, yob_gentable, forum_gentable, cgtable, class_suppress)
+    count_dict = make_count_dict(prop_dict)
+    full_suppress_list = class_suppress
+    suppress_total = len(class_suppress)
+    print 'Number of suppressed records due to class identification is', suppress_total
+    for i in range(1, k_val):
+        count = 0
+        if i not in count_dict:
+            print 'No properties with only ', str(i), 'records'
+            continue
+        for id_pair in count_dict[i]:
+            for e in prop_dict[id_pair]:
+                full_suppress_list.add(e)
+            count += len(prop_dict[id_pair])
+            suppress_total += len(prop_dict[id_pair])
+        print 'Suppress records for value ', str(i), 'is', str(count)
+    print 'Total suppressed records is ', suppress_total
+    outf = open(suppress_out, 'w')
+    pickle.dump(full_suppress_list, outf)
+    outf.close()
+
+
 if __name__ == '__main__':
     """
     Build a full suppression table for a particular level of k-anonymity
@@ -97,37 +126,7 @@ if __name__ == '__main__':
     suppress_out = sys.argv[4]
     k_val = int(sys.argv[5])
 
-    cr = dbOpen(db_filename)
-    yob_gentable = build_numeric_dict(cr, 'YoB_bins')
-    forum_gentable = build_numeric_dict(cr, 'nforum_posts_bins')
-    cgtable = get_pickled_table(geo_suppress)
-    class_suppress = get_pickled_table(cl_suppress)
-
-    prop_dict = make_list_dict(cr, yob_gentable, forum_gentable, cgtable, class_suppress)
-
-    count_dict = make_count_dict(prop_dict)
-
-    full_suppress_list = class_suppress
-    suppress_total = len(class_suppress)
-    print 'Number of suppressed records due to class identification is', suppress_total
-
-    for i in range(1,k_val):
-        count = 0
-        if i not in count_dict:
-            print 'No properties with only ', str(i), 'records'
-            continue
-        for id_pair in count_dict[i]:
-            for e in prop_dict[id_pair]:
-                full_suppress_list.add(e)
-            count += len(prop_dict[id_pair])
-            suppress_total += len(prop_dict[id_pair])
-        print 'Suppress records for value ', str(i), 'is', str(count)
-
-    print 'Total suppressed records is ', suppress_total
-
-    outf = open(suppress_out, 'w')
-    pickle.dump(full_suppress_list, outf)
-    outf.close()
+    main(db_filename, cl_suppress, geo_suppress, suppress_out, k_val)
 
 
 

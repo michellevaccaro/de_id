@@ -1,3 +1,21 @@
+6/21/15
+
+Extracted a main method from buildcountrygeneralizer.py so that it can be called
+from another script. The main program will take the names of the files needed
+to populate the in-memory structures, open them and build the structures, and then
+write the country generalization table to disk. This is the first of two step for
+this process (ultimately); the next step will be to extract the code that reads
+and writes the files and have the processing done on in-memory structures that can
+be passed from program to program by a wrapping script.
+
+Did the same with buildFullSuppressionSet.py; this will also need to be re-factored
+to get rid of writing all of the intermediate values to disk; there also needs to be
+some review of the information (some of it useful, much of it for debugging) that is
+currently printed out by the main routine.
+
+Did the same with courseSetDeIdentify.py, also adding the ability to decide to use
+suppression by activity or suppression by random choice to the input parameters.
+
 5/21/15
 Added a generalization dictionary for level of education. There will be two categories;
 those who have finished at least a bachelor's degree (labelled 'pg') and those who have

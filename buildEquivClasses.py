@@ -130,7 +130,6 @@ if __name__ == '__main__':
     flexible mechanism for this but finding one that is not error prone is difficult.
 
     """
-    idFields = [0, 10, 11, 12, 19]
     fname = utils.getFileName('data file to test')
     if fname[-3:] == 'csv':
         anonDict = makeDictFromCSV(idFields, fname)
@@ -140,6 +139,7 @@ if __name__ == '__main__':
         print 'Unknown file type; program exiting'
         exit(1)
 
+    idFields = [0, 10, 11, 12, 19]
     qiequivDict = makeEquivDict(anonDict)
 
     sortedDict = sorted(qiequivDict.iterkeys())

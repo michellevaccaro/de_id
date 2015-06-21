@@ -144,6 +144,22 @@ def printtables(countrydist, gentable, gensizetable):
     for country, value in gentable.iteritems():
         print country, value
 
+
+def main(dbname, outname, ccfname, print_table):
+    c = dbOpen(dbname)
+    c.execute('Select final_cc_cname from source')
+    countries = c.fetchall()
+    countrydist = builddistdict(countries)
+    country2cont = readcountrycont(ccfname)
+    cont2country = buildcont2country(country2cont)
+    gentable, gensizetable = buildgentable(countrydist, country2cont, cont2country, geo_binsize)
+    outf = open(outname, 'w')
+    pickle.dump(gentable, outf)
+    outf.close()
+    if print_table:
+        printtables(countrydist, gentable, gensizetable)
+
+
 if __name__ == '__main__':
     if len(sys.argv) < 4:
         print 'Usage: buildcountrygeneralizer databaseFile outputFile country_to_continent_file {p}'
@@ -153,20 +169,10 @@ if __name__ == '__main__':
     outname = sys.argv[2]
     ccfname = sys.argv[3]
 
-    c = dbOpen(dbname)
-    c.execute('Select final_cc_cname from source')
-    countries = c.fetchall()
-
-    countrydist = builddistdict(countries)
-    country2cont = readcountrycont('../country_continent')
-    cont2country = buildcont2country(country2cont)
-
-    gentable, gensizetable = buildgentable(countrydist, country2cont, cont2country, geo_binsize)
-
-    outf = open(outname, 'w')
-    pickle.dump(gentable, outf)
-    outf.close()
-
     if (len(sys.argv) > 4) and (sys.argv[4] == 'p'):
-        printtables(countrydist, gentable, gensizetable)
+        print_table = True
+    else:
+        print_table = False
+
+    main(dbname, outname, ccfname, print_table)
 
