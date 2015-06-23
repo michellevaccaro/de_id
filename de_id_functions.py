@@ -58,8 +58,9 @@ def dbOpen(db):
     will create if doesn't already exist
     """
     conn = sqlite3.connect(db)
+    conn.text_factory = str
     c = conn.cursor()
-    c.execute('Pragma cache_size = 400000')
+    c.execute('Pragma cache_size = 600000')
     return c
 
 def dbClose(cursor, closeFlag=True):

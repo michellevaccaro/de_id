@@ -61,7 +61,6 @@ def sourceLoad(cursor, fname, tableName):
             tableInsert += "?,"
         tableCreate += headers[-1] + " text )"
         tableInsert += "?)"
-        print len(headers)
         cursor.execute(tableCreate)
 
         idDict = {}
@@ -77,9 +76,7 @@ def sourceLoad(cursor, fname, tableName):
                 row[15] = ''
             #row += ''
             trow = tuple(row)
-            print trow, len(trow)
             #trow += (",")
-            print tableInsert
             cursor.execute(tableInsert, trow)
 
     #cursor.execute("ALTER TABLE "+tableName+" ADD COLUMN Count integer")
@@ -99,8 +96,9 @@ if __name__ == '__main__':
 
     c = dbOpen(dbFileName)
     sourceLoad(c, fromFileName, 'source')
-    countryNamer(c, 'source', 'final_cc')
-    contImport(c, 'source', 'country_continent', 'final_cc_cname')
+ #   countryNamer(c, 'source', 'final_cc')
+ #   contImport(c, 'source', 'country_continent', 'final_cc_cname')
+    dbClose(c)
 
     if verbose:
         c.execute("SELECT name FROM sqlite_master WHERE type='table';")
