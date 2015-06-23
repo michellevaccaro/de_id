@@ -55,29 +55,35 @@ def sourceLoad(cursor, fname, tableName):
         tableCreate = "CREATE TABLE "+tableName+" ("
         tableInsert = "INSERT INTO "+tableName+" VALUES ("
         for col in headers[:-1]:
+            if '.' in col:
+                col = string.replace(col, '.', '_')
             tableCreate += col+" text, "
             tableInsert += "?,"
-        tableCreate += headers[-1]+" text, kkey text)"
+        tableCreate += headers[-1] + " text )"
+        tableInsert += "?)"
+        print len(headers)
         cursor.execute(tableCreate)
 
-        tableInsert += "?, ?)"
         idDict = {}
         for row in csvIn:
-            if (row[25] == 'instructor') or (row[25] == 'staff' ):
+            if (row[29] == 'instructor') or (row[29] == 'staff' ):
                 continue
-            row[14] = splitDate(row[14])
-            row[15] = splitDate(row[15])
-            row[1] = idGen2(row[1], 'MHxPC13', idDict)
-            if not (not (row[11] == 'NA') and not (row[11] < '1930') and not (row[11] > '2005')):
-                row[11] = ''
-            if row[12] == 'NA':
-                row[12] = ''
+            row[17] = splitDate(row[17])
+            row[18] = splitDate(row[18])
+            row[1] = idGen2(row[1], 'MHxPC14', idDict)
+            if not (not (row[14] == 'NA') and not (row[14] < '1930') and not (row[14] > '2005')):
+                row[14] = ''
+            if row[15] == 'NA':
+                row[15] = ''
+            #row += ''
             trow = tuple(row)
-            trow += ("",)
+            print trow, len(trow)
+            #trow += (",")
+            print tableInsert
             cursor.execute(tableInsert, trow)
 
-    cursor.execute("ALTER TABLE "+tableName+" ADD COLUMN Count integer")
-    cursor.execute("UPDATE "+tableName+" SET Count =1")
+    #cursor.execute("ALTER TABLE "+tableName+" ADD COLUMN Count integer")
+    #cursor.execute("UPDATE "+tableName+" SET Count =1")
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
