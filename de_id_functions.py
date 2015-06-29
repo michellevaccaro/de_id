@@ -26,7 +26,7 @@ import pycountry, cPickle, math
 
 YoB_binsize = 3000
 nforum_post_binsize = 3000
-geo_binsize = 3000
+geo_binsize = 5000
 
 
 
@@ -60,7 +60,7 @@ def dbOpen(db):
     conn = sqlite3.connect(db)
     conn.text_factory = str
     c = conn.cursor()
-    c.execute('Pragma cache_size = 600000')
+    c.execute('Pragma cache_size = 1000000')
     return c
 
 def dbClose(cursor, closeFlag=True):
@@ -84,11 +84,14 @@ def countryNamer(cursor, tableName, countryCode):
     takes a variable, finds the unique instances of country codes, generates map
     to country names, then updates the country codes to country names where possible
     """
-    qry = selUnique(cursor,tableName,countryCode)
+    #qry = selUnique(cursor,tableName,countryCode)
+    qry_string = 'Select ' + countryCode + ' from ' + tableName
+    qry = cursor.execute(qry_string)
     cnameDict = {}
     for row in qry:
         try:
-            cnameDict[row[0]]=pycountry.countries.get(alpha2=str(row[0])).name
+            if row[0] not in cnameDict:
+                cnameDict[row[0]]=pycountry.countries.get(alpha2=str(row[0])).name
         except Exception as err:
             print "Err %s on: cc=%s" % (err, row[0])
             cnameDict[row[0]]=str(row[0])

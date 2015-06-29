@@ -79,8 +79,6 @@ def sourceLoad(cursor, fname, tableName):
             #trow += (",")
             cursor.execute(tableInsert, trow)
 
-    #cursor.execute("ALTER TABLE "+tableName+" ADD COLUMN Count integer")
-    #cursor.execute("UPDATE "+tableName+" SET Count =1")
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
@@ -96,7 +94,7 @@ if __name__ == '__main__':
 
     c = dbOpen(dbFileName)
     sourceLoad(c, fromFileName, 'source')
- #   countryNamer(c, 'source', 'final_cc')
+    countryNamer(c, 'source', 'final_cc')
  #   contImport(c, 'source', 'country_continent', 'final_cc_cname')
     dbClose(c)
 

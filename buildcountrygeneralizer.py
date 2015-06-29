@@ -147,7 +147,7 @@ def printtables(countrydist, gentable, gensizetable):
 
 def main(dbname, outname, ccfname, print_table):
     c = dbOpen(dbname)
-    c.execute('Select final_cc_cname from source')
+    c.execute('Select profile_country from source')
     countries = c.fetchall()
     countrydist = builddistdict(countries)
     country2cont = readcountrycont(ccfname)
