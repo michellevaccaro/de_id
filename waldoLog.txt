@@ -1,3 +1,27 @@
+6/29/15
+Changing the buildcountrygeneralizer.py to work with the year two data set. The first change is
+to use the cc_by_ip field in the database; this is the country code as determined by the
+ip number of the most common login. While this isn't perfect as a locator, it is better than
+the self-provided country codes or names, which are nearly always blank.
+
+Moved the global geo_binsize from de_id_functions.py to this program, since this is the only
+place that the global is used. It might be useful to make this into a command-line option
+rather than having to edit the source code to change the bin size.
+
+Rather than changing the .db file to include the name of the country for each student, we will
+use the cc_by_ip field, which is a country code. This can be mapped to the country name by using
+the pycountry library. There are other fields that proport to have the country for the student in them,
+but these are self-reported and often have no content.
+
+We then build four dictionaries:
+    cc_to_countries, which maps from the cc_by_ip field to the name of a country, gotten from pycountry;
+    countrydist, which maps from country code to the number of instances with that value
+    country2cont, which maps from the name (not code) of a country to the region for that country; this is just
+        reading in the values in a table that has already been created and stored in a file
+    cont2country, which takes the country2cont table and the country code to country table and does an inverse
+    mapping, allowing mapping from a region to the set of country codes
+
+
 6/21/15
 
 Extracted a main method from buildcountrygeneralizer.py so that it can be called

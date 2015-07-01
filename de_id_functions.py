@@ -26,7 +26,6 @@ import pycountry, cPickle, math
 
 YoB_binsize = 3000
 nforum_post_binsize = 3000
-geo_binsize = 5000
 
 
 
@@ -60,7 +59,7 @@ def dbOpen(db):
     conn = sqlite3.connect(db)
     conn.text_factory = str
     c = conn.cursor()
-    c.execute('Pragma cache_size = 1000000')
+    c.execute('Pragma cache_size = 2000000')
     return c
 
 def dbClose(cursor, closeFlag=True):
@@ -221,7 +220,6 @@ def contSwap(cursor, tableName, varName1, varName2, th):
     print "countries: "+str(len(countries))
     count = 1
     for country in countries:
-        #print count
         count +=1
         cname = country[0]
         contname = country[1]

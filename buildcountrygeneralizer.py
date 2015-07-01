@@ -21,11 +21,12 @@ where
 
 __author__ = 'waldo'
 
-import sys, pickle, os
+import sys, pickle, pycountry
 from de_id_functions import *
 from edLevelDistribution import builddistdict
 import utils
 
+geo_binsize = 25000
 
 def readcountrycont(ccfile = ''):
     """
@@ -46,24 +47,27 @@ def readcountrycont(ccfile = ''):
     pf.close()
     return ccdict
 
-def buildcont2country(ccdict):
+def buildcont2country(cc_to_name, ccdict):
     """
-    Build a dictionary from regions to a list of countries in that region.
+    Build a dictionary from regions to a list of country codes in that region.
 
     This dictionary gets used if, after combining all of the countries that don't have
     a minimal number of records in that country, the region still does not have the minimal
     count. The rest of the countries are then used to increase the region count.
 
+    :param cc_to_name: A dictionary from country codes to country names
     :param ccdict: The dictionary from country to region
-    :return: A dictionary from region to list of countries in that region
+    :return: A dictionary from region to list of country codes in that region
     """
     retdict = {}
-    for country, cont in ccdict.items():
-        if cont in retdict:
-            if country not in retdict[cont]:
-                retdict[cont].append(country)
-        else:
-            retdict[cont] = [country]
+    for cc, country in cc_to_name.iteritems():
+        if country in ccdict:
+            cont = ccdict[country]
+            if cont in retdict:
+                if cc not in retdict[cont]:
+                    retdict[cont].append(cc)
+            else:
+                retdict[cont] = [cc]
     return retdict
 
 def addtogencount(gensize, cont, count):
@@ -83,12 +87,12 @@ def addtogencount(gensize, cont, count):
     else:
         gensize[cont] += count
 
-def buildgentable(countrydist, country2cont, cont2country, minsize):
+def buildgentable(countrydist, cc_to_countries, country2cont, cont2country, minsize):
     """
-    Build the dictionary that maps from countries to a geographic area with at least minsize records
+    Build the dictionary that maps from country codes to a geographic area with at least minsize records
 
-    This routine builds a dictionary keyed by country, with value either the country (if there
-    are sufficient records, determined by minsize) the country itself, or a region that will contain
+    This routine builds a dictionary keyed by country code, with value either the full name of the country
+    (if there are sufficient records, determined by minsize), or a region that will contain
     at least minsize records.
 
     :param countrydist: A dictionary keyed by country with value the number of records for that country
@@ -101,27 +105,48 @@ def buildgentable(countrydist, country2cont, cont2country, minsize):
     """
     retdict = {}
     gensize = {}
-    for country, count in countrydist.iteritems():
+    for c_code, count in countrydist.iteritems():
+        country_name = cc_to_countries[c_code]
         if count < minsize:
-            retdict[country] = country2cont[country]
-            addtogencount(gensize, country2cont[country], count)
+            if country_name in country2cont:
+                retdict[c_code] = country2cont[country_name]
+                addtogencount(gensize, country2cont[country_name], count)
+            else:
+                retdict[c_code] = ''
         else:
-            retdict[country] = country
+            retdict[c_code] = country_name
 
     for region, size in gensize.iteritems():
         if size < minsize:
             mcountry = ''
-            msize = 10000
-            for country in cont2country[region]:
-                if (country in retdict) \
-                        and (retdict[country] == country) \
-                        and countrydist[country] < msize:
-                    mcountry = country
-                    msize = countrydist[country]
+            msize = size
+            for c_code in cont2country[region]:
+                if (c_code in retdict) \
+                        and (retdict[c_code] == cc_to_countries[c_code]) \
+                        and countrydist[c_code] < geo_binsize:
+                    mcountry = c_code
+                    msize += countrydist[c_code]
             retdict[mcountry] = region
-            gensize[region] += msize
+            gensize[region] = msize
 
     return retdict, gensize
+
+def build_cc_to_country(cc):
+    """
+    Build a dictionary keyed by country codes with values country names
+    :param cc:
+    :return:
+    """
+    retDict = {}
+    for i in cc:
+        if i not in retDict:
+            try:
+                retDict[i] = pycountry.countries.get(alpha2 = i).name
+            except Exception as err:
+                print 'Error in looking up country code ', i
+                retDict[i] = ''
+    return retDict
+
 
 def printtables(countrydist, gentable, gensizetable):
     """
@@ -145,14 +170,15 @@ def printtables(countrydist, gentable, gensizetable):
         print country, value
 
 
-def main(dbname, outname, ccfname, print_table):
+def main(dbname, outname, ccfname, print_table = False):
     c = dbOpen(dbname)
-    c.execute('Select profile_country from source')
-    countries = c.fetchall()
-    countrydist = builddistdict(countries)
+    c.execute('Select cc_by_ip from source')
+    countrydist = builddistdict(c.fetchall())
+    country_codes = countrydist.keys()
+    cc_to_countries = build_cc_to_country(country_codes)
     country2cont = readcountrycont(ccfname)
-    cont2country = buildcont2country(country2cont)
-    gentable, gensizetable = buildgentable(countrydist, country2cont, cont2country, geo_binsize)
+    cont2country = buildcont2country(cc_to_countries, country2cont)
+    gentable, gensizetable = buildgentable(countrydist, cc_to_countries, country2cont, cont2country, geo_binsize)
     outf = open(outname, 'w')
     pickle.dump(gentable, outf)
     outf.close()
@@ -171,7 +197,7 @@ if __name__ == '__main__':
 
     if (len(sys.argv) > 4) and (sys.argv[4] == 'p'):
         print_table = True
-    else:
+    else :
         print_table = False
 
     main(dbname, outname, ccfname, print_table)
