@@ -26,7 +26,7 @@ from de_id_functions import *
 from edLevelDistribution import builddistdict
 import utils
 
-geo_binsize = 25000
+geo_binsize = 5000
 
 def readcountrycont(ccfile = ''):
     """

@@ -10,26 +10,27 @@ The set of fields that will be written to the output file. These need to be the 
 they appear in the database, and will also be the names used for the header of the csv
 file. While I generally deplore the use of globals, in this case it makes sense.
 """
-wfields = ['course_id',
-           'user_id',
-           'registered',
-           'viewed',
-           'explored',
-           'certified',
-           'final_cc_cname',
-           'LoE',
-           'YoB',
-           'gender',
-           'grade',
-           'start_time',
-           'last_event',
-           'nevents',
-           'ndays_act',
-           'nplay_video',
-           'nchapters',
-           'nforum_posts',
-           'roles'
-           ]
+
+header_pr = ['Course ID',
+             'User ID',
+             'Explored',
+             'Certified',
+             'Location',
+             'Level of Education',
+             'Year of Birth',
+             'Mean YoB',
+             'Gender',
+             'Grade',
+             'Start time',
+             'Last Interaction',
+             'Number of Events',
+             'Number of Forum Posts',
+             'Mean Number of Forum Posts',
+             'Total Time Spent',
+             'Ever Taught',
+             'Ever Taught This Course',
+             'Reason for Taking Course'
+             ]
 
 loe_dict = { 'nan' : 'ug',
              'NA': 'ug',
@@ -47,6 +48,25 @@ loe_dict = { 'nan' : 'ug',
              'p_oth': 'pg'
              }
 
+wfields = ['course_id',
+           'user_id',
+           'explored',
+           'certified',
+           'cc_by_ip',
+           'LoE',
+           'YoB',
+           'gender',
+           'grade',
+           'start_time',
+           'last_event',
+           'nevents',
+           'nforum_posts',
+           'sum_dt',
+           'prs_teach',
+           'prs_teach_crs',
+           'prs_reason_lc'
+           ]
+
 def build_select_string(tablename):
     """
     Build a string to be used in an SQL select statement
@@ -56,10 +76,8 @@ def build_select_string(tablename):
     :param tablename: Name of the table from which the fields are to be taken
     :return: a string suitable for using in an execute() statement
     """
-    retstr = 'Select ' + wfields[0]
-    for i in range(1,len(wfields) - 1):
-        retstr = retstr + ', ' + wfields[i]
-    retstr = retstr + ' from ' + tablename
+    fieldstr = ', '.join(wfields)
+    retstr = "Select " + fieldstr + ' from ' + tablename
     return retstr
 
 def get_pickled_table(filename):
@@ -75,19 +93,19 @@ def get_pickled_table(filename):
 
 def build_numeric_dict(cr, table_name):
     """
-    Build a generalization dictioclassSnary from a table.
+    Build a generalization dictionary from a table of keys, ranges, and means.
 
-    This assumes the table has keys that are numeric values and values that are ranges that the values
-    map to for generalization.
+    This assumes the table has keys that are numeric values (in string form) and values that are ranges that the values
+    map to for generalization, and the mean for that range.
     :param cr: A cursor for the database containing the table
     :param table_name: The name of the table to be used to build the dictionary
-    :return: A dictionary with keys the numeric values and values numeric ranges that generalize those values
+    :return: A dictionary with keys the numeric values, values numeric ranges  and means that generalize those values
     """
     ret_dict = {}
     sel_string = "Select * from " + table_name
     cr.execute(sel_string)
     for pair in cr.fetchall():
-        ret_dict[pair[0]] = pair[1]
+        ret_dict[pair[0]] = [pair[1], pair[2]]
     return ret_dict
 
 
@@ -98,7 +116,7 @@ def init_csv_file(fhandle):
     :return: a csv.writer object
     """
     outf = csv.writer(fhandle)
-    outf.writerow(wfields)
+    outf.writerow(header_pr)
     return outf
 
 
@@ -127,21 +145,34 @@ def main(db_file_name, outname, csuppress_file_name, cg_file_name):
     yob_dict = build_numeric_dict(c, 'YoB_bins')
     forum_dict = build_numeric_dict(c, 'nforum_posts_bins')
     c.execute(build_select_string('source'))
-    rec_list = c.fetchall()
     supressed_records = len(csuppress)
     encoding_errors = 0
-    for rec in rec_list:
+    for rec in c.fetchall():
         if rec[0] + rec[1] not in csuppress:
             l = list(rec)
-            l[6] = cgtable[l[6]]
-            if l[7] in loe_dict:
-                l[7] = loe_dict[l[7]]
+            l[4] = cgtable[l[4]]
+            if l[5] in loe_dict:
+                l[5] = loe_dict[l[5]]
             else:
-                l[7] = 'ug'
-            if (l[8] != ''):
-                l[8] = yob_dict[l[8]]
-            if l[17] != '':
-                l[17] = forum_dict[l[17]]
+                l[5] = 'ug'
+            if (l[6] == '') or (l[6] == '9999.0'):
+                l[6] = ''
+                l.insert(7, '')
+            else:
+                year = l[6][:-2]
+                yrange = yob_dict[year][0]
+                ymean = yob_dict[year][1]
+                l[6] = yrange
+                l.insert(7, ymean)
+            if (l[13] == '') or (l[13] == '9999.0'):
+                l[13] = ''
+                l.insert(14,'')
+            else:
+                nf = l[13][:-2]
+                nf_range = forum_dict[nf][0]
+                nf_mean = forum_dict[nf][1]
+                l[13] = nf_range
+                l.insert(14, nf_mean)
             try:
                 csvout.writerow(l)
             except:
@@ -158,10 +189,10 @@ if __name__ == '__main__':
     of the de-identified csv file, and pass those names on to the main() routine,
     which does all of the actual work.
 
-    Usage: buildDeIdentifiedCSV databaseIn CSVfileOut courseSupressionFile countryGeneralizationFile
+    Usage: buildDeIdentifiedCSV databaseIn CSVfileOut recordSupressionFile countryGeneralizationFile
     """
     if len(sys.argv) < 5:
-        print 'Usage: buildDeIdentifiedCSV databaseIn CSVfileOut courseSupressionFile countryGeneralizationFile'
+        print 'Usage: buildDeIdentifiedCSV databaseIn CSVfileOut recordSuppressFile countryGeneralizationFile'
         sys.exit(1)
     db_file_name = sys.argv[1]
     outname = sys.argv[2]

@@ -12,9 +12,7 @@ def make_key(key_list):
     :param key_list: a list of items that will form the key
     :return: A single string that is the concatenation of the items in the list
     """
-    ret_string = ''
-    for ent in key_list:
-        ret_string += ent
+    ret_string = ''.join(key_list)
     return ret_string
 
 def make_list_dict(cr, yob_gentable, forum_gentable, cgtable, suppress_table):
@@ -36,16 +34,19 @@ def make_list_dict(cr, yob_gentable, forum_gentable, cgtable, suppress_table):
     """
     ret_dict = {}
 
-    for ent in cr.execute('Select user_id, course_id, final_cc_cname, LoE, Yob, gender, nforum_posts from source'):
+    for ent in cr.execute('Select user_id, course_id, cc_by_ip, LoE, Yob, gender, nforum_posts from source'):
         course_user = ent[1] + ent [0]
         if course_user not in suppress_table:
             entl = list(ent[1:])
             entl[1] = cgtable[entl[1]]
             if entl[2] in loe_dict:
                 entl[2] = loe_dict[entl[2]]
+            entl[3] = entl[3][:-2]
             if entl[3] in yob_gentable:
-                entl[3] = yob_gentable[entl[3]]
-            entl[5] = forum_gentable[entl[5]]
+                entl[3] = yob_gentable[entl[3]][0]
+            entl[5] = entl[5][:-2]
+            if entl[5] in forum_gentable:
+                entl[5] = forum_gentable[entl[5]][0]
             dict_key = make_key(entl)
             if dict_key in ret_dict:
                 ret_dict[dict_key].append(course_user)
@@ -115,6 +116,11 @@ if __name__ == '__main__':
     suppressed to reach that level of k with the generalization that has already occurred. The full suppression list,
     including the records that need to be suppressed because of combinations of classes (i.e., the class suppression list)
     will be pickled into a file supplied as one of the command line arguments.
+
+    Note that this program assumes that the only quasi-identifiers in the set are the Year of Birth, number of forum posts,
+    level of education, location, gender, and classes taken. For both the year1 and year2 sets, this is the case, but
+    if other quasi-identifiers are added to the output set, this program will need to be modified to take into account
+    those identifiers.
     """
     if len(sys.argv) < 5:
         print 'Useage: buildFullSuppressionSet.py databaseFile classSuppress geoSuppress NewSuppress k-anonValue'

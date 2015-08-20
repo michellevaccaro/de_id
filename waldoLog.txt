@@ -1,3 +1,32 @@
+8/20/15
+
+Finished the first round that will de-identify the year2 data sets. Lots more suppression because of identification by
+the set of classes, which is interested. Needed to deal with the floating-point appearance of the YoB and nforum posts;
+the current solution is to simply slice the last two characters off (since they all end in '.0'); a more general solution
+would be to take the str(int(float())) of the value. Maybe soon.
+
+An even better improvement for the buildDeIdentifiedCSV.py program would be to create an object that was the record, and
+have methods that would add the calculated fields. There could also be a method that would give the right order to the
+fields when things like the mean is added. This would make more sense than the indexing that is currently happenting, which
+is both obscure and error prone. This approach might actually make some sense.
+
+8/19/15
+After changing Olivia's numeric_generalization code to run as a stand-alone program, the database table that stores
+the bins for numbers of forum posts (nforum_posts_bins) was not being saved, even though it used the same code as
+was used to generate the bins for Year of Birth (which was being saved). Stepping through the code by hand caused the
+table to be saved. Putting in print messages caused the data to be saved. But running the same code stand-alone resulted
+in the table not being saved.
+
+A classic Heisenbug; it only appears when you aren't looking. Which means that it was a timing issue.
+
+The real problem was that the program was exiting before the implicit synchronization of the sqlite database when run
+stand-alone, but this synchronization was happening in the time it took to either run the program in a python shell or
+when there were print statements. The solution was to do an explicit close of the database at the end of the program,
+which forces a write of any changes.
+
+I also moved the constants YoB_binsize and nforum_post_binsize to this file, as it is the only one that uses these
+constants.
+
 6/29/15
 Changing the buildcountrygeneralizer.py to work with the year two data set. The first change is
 to use the cc_by_ip field in the database; this is the country code as determined by the
