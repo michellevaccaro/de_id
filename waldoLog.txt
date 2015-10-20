@@ -1,3 +1,27 @@
+8/26
+
+Problem found. While the code in numeric_generalization.py creates a table entry for nforum_posts of
+'9999', that value is used to mark entries where there were no posts. In the generalization code
+this was replaced by the range in the table (73-9999), but in the generation of the .csv file it was replaced
+by a blank (along with a blank for the mean). The correct way to deal with this is to replace the value
+'9999' with '0' in both places, and have the mean from those values be '0'. Doing this meant more records
+were suppressed, but the resulting files were k-anonymous.
+
+8/24
+
+A lot of the code has been simplified, but the failure to anonymize remains. I did build the suppression set without taking
+into account the number of forum posts, and the .csv file that was generated off of that suppression set was 5-anon. So
+this would indicate that the problem is in the handling of the number of forum posts, which at least narrows it down.
+
+8/22 and 8/23
+
+Olivia wrote to say that the de-identified sets were in fact not 5-anonymous, which I thought they
+were. Trying to track down where the problem is.
+
+Checked to make sure that none of the records that are in the full suppression set are being written into the
+final CSV file. In fact, none are, so it appears that the buildDeIdentifiedCSV program is working correctly,
+writing all and only those records that are not in the full suppression set.
+
 8/20/15
 
 Finished the first round that will de-identify the year2 data sets. Lots more suppression because of identification by

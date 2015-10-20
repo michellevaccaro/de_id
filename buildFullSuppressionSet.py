@@ -15,6 +15,30 @@ def make_key(key_list):
     ret_string = ''.join(key_list)
     return ret_string
 
+def get_LOE(level):
+    try:
+        return loe_dict[level]
+    except:
+        print "LOE ", level, ' not in LOE_gentable'
+        return ''
+
+def get_YOB(for_year, yob_gentable):
+    for_year = for_year[:-2]
+    try:
+        return yob_gentable[for_year][0]
+    except:
+        return for_year
+
+def get_nforum(posts, post_table):
+    k = posts[:-2]
+    if k == '9999':
+        return '0'
+    try:
+        return post_table[k][0]
+    except:
+        print 'Form posts number', posts, 'not in forum generalization table'
+        return posts
+
 def make_list_dict(cr, yob_gentable, forum_gentable, cgtable, suppress_table):
     """
     Build a dictionary keyed by a concatenation of generalized quasi-identiiers with value a list of the course_id,
@@ -33,21 +57,13 @@ def make_list_dict(cr, yob_gentable, forum_gentable, cgtable, suppress_table):
     have that combination of quasi-identifiers.
     """
     ret_dict = {}
-
+    i = 0
     for ent in cr.execute('Select user_id, course_id, cc_by_ip, LoE, Yob, gender, nforum_posts from source'):
         course_user = ent[1] + ent [0]
         if course_user not in suppress_table:
-            entl = list(ent[1:])
-            entl[1] = cgtable[entl[1]]
-            if entl[2] in loe_dict:
-                entl[2] = loe_dict[entl[2]]
-            entl[3] = entl[3][:-2]
-            if entl[3] in yob_gentable:
-                entl[3] = yob_gentable[entl[3]][0]
-            entl[5] = entl[5][:-2]
-            if entl[5] in forum_gentable:
-                entl[5] = forum_gentable[entl[5]][0]
-            dict_key = make_key(entl)
+            key_list = [ent[1], cgtable[ent[2]], get_LOE(ent[3]), get_YOB(ent[4], yob_gentable),
+                        ent[5], get_nforum(ent[6], forum_gentable)]
+            dict_key = ''.join(key_list)
             if dict_key in ret_dict:
                 ret_dict[dict_key].append(course_user)
             else:
@@ -86,24 +102,16 @@ def main(db_filename, cl_suppress, geo_suppress, suppress_out, k_val):
     cgtable = get_pickled_table(geo_suppress)
     class_suppress = get_pickled_table(cl_suppress)
     prop_dict = make_list_dict(cr, yob_gentable, forum_gentable, cgtable, class_suppress)
-    count_dict = make_count_dict(prop_dict)
-    full_suppress_list = class_suppress
+    full_suppress_list = list(class_suppress)
     suppress_total = len(class_suppress)
     print 'Number of suppressed records due to class identification is', suppress_total
-    for i in range(1, k_val):
-        count = 0
-        if i not in count_dict:
-            print 'No properties with only ', str(i), 'records'
-            continue
-        for id_pair in count_dict[i]:
-            for e in prop_dict[id_pair]:
-                full_suppress_list.add(e)
-            count += len(prop_dict[id_pair])
-            suppress_total += len(prop_dict[id_pair])
-        print 'Suppress records for value ', str(i), 'is', str(count)
-    print 'Total suppressed records is ', suppress_total
+    for k,v in prop_dict.iteritems():
+        if len(v) < k_val:
+            full_suppress_list.extend(v)
+    print 'Total number of records suppressed =', str(len(full_suppress_list))
     outf = open(suppress_out, 'w')
-    pickle.dump(full_suppress_list, outf)
+    full_suppress_set = set(full_suppress_list)
+    pickle.dump(full_suppress_set, outf)
     outf.close()
 
 

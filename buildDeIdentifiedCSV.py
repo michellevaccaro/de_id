@@ -104,8 +104,8 @@ def build_numeric_dict(cr, table_name):
     ret_dict = {}
     sel_string = "Select * from " + table_name
     cr.execute(sel_string)
-    for pair in cr.fetchall():
-        ret_dict[pair[0]] = [pair[1], pair[2]]
+    for value, range, mean in cr.fetchall():
+        ret_dict[value] = [range, mean]
     return ret_dict
 
 
@@ -163,16 +163,22 @@ def main(db_file_name, outname, csuppress_file_name, cg_file_name):
                 yrange = yob_dict[year][0]
                 ymean = yob_dict[year][1]
                 l[6] = yrange
-                l.insert(7, ymean)
+                try:
+                    l.insert(7, str(round(float(ymean), 2)))
+                except:
+                    l.insert(7, 'NA')
             if (l[13] == '') or (l[13] == '9999.0'):
-                l[13] = ''
-                l.insert(14,'')
+                l[13] = '0'
+                l.insert(14,'0')
             else:
                 nf = l[13][:-2]
                 nf_range = forum_dict[nf][0]
                 nf_mean = forum_dict[nf][1]
                 l[13] = nf_range
-                l.insert(14, nf_mean)
+                try:
+                    l.insert(14, str(round(float(nf_mean), 2)))
+                except:
+                    l.insert(14, 'NA')
             try:
                 csvout.writerow(l)
             except:

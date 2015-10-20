@@ -1,10 +1,22 @@
 #!/usr/bin/env python
+"""
+Bin a set of numeric values so that at least n entities are within each bin. In particular,
+this code will take the Year of Birth (YoB) and the number of forum posts (nforum_posts) values
+and produce bins with a particular range and calculate the mean for that range.
+
+The value '9999' (or '9999.0') is used as a marked value to show that there is nothing associated
+in the record. For YoB, this value is not recorded in the resulting table of intervals and
+means. For nforum posts, this value is included in the table, given an interval which includes
+the final interval for the posts, but should be treated specially when calculating suppression
+sets for anonymity and when producing the final, de-identified data file. In those cases,
+the value of '9999.0' should be caught specially and replaced with '0'.
+"""
 
 from de_id_functions import *
 import sys
 
-YoB_binsize = 5000
-nforum_post_binsize = 5000
+YoB_binsize = 25000
+nforum_post_binsize = 25000
 
 
 # Working for year of birth and number of forum posts
