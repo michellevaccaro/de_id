@@ -74,9 +74,7 @@ def sourceLoad(cursor, fname, tableName):
                 row[14] = ''
             if row[15] == 'NA':
                 row[15] = ''
-            #row += ''
             trow = tuple(row)
-            #trow += (",")
             cursor.execute(tableInsert, trow)
 
 

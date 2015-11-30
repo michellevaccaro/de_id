@@ -5,6 +5,7 @@ from de_id_functions import *
 from buildDeIdentifiedCSV import build_numeric_dict, get_pickled_table, loe_dict
 import sys, pickle
 
+
 def make_key(key_list):
     """
     Build a key by concatenating the items in a list into a single string
@@ -15,6 +16,7 @@ def make_key(key_list):
     ret_string = ''.join(key_list)
     return ret_string
 
+
 def get_LOE(level):
     try:
         return loe_dict[level]
@@ -22,12 +24,14 @@ def get_LOE(level):
         print "LOE ", level, ' not in LOE_gentable'
         return ''
 
+
 def get_YOB(for_year, yob_gentable):
     for_year = for_year[:-2]
     try:
         return yob_gentable[for_year][0]
     except:
         return for_year
+
 
 def get_nforum(posts, post_table):
     k = posts[:-2]
@@ -38,6 +42,7 @@ def get_nforum(posts, post_table):
     except:
         print 'Form posts number', posts, 'not in forum generalization table'
         return posts
+
 
 def make_list_dict(cr, yob_gentable, forum_gentable, cgtable, suppress_table):
     """
@@ -59,7 +64,7 @@ def make_list_dict(cr, yob_gentable, forum_gentable, cgtable, suppress_table):
     ret_dict = {}
     i = 0
     for ent in cr.execute('Select user_id, course_id, cc_by_ip, LoE, Yob, gender, nforum_posts from source'):
-        course_user = ent[1] + ent [0]
+        course_user = ent[1] + ent[0]
         if course_user not in suppress_table:
             key_list = [ent[1], cgtable[ent[2]], get_LOE(ent[3]), get_YOB(ent[4], yob_gentable),
                         ent[5], get_nforum(ent[6], forum_gentable)]
@@ -69,6 +74,7 @@ def make_list_dict(cr, yob_gentable, forum_gentable, cgtable, suppress_table):
             else:
                 ret_dict[dict_key] = [course_user]
     return ret_dict
+
 
 def make_count_dict(prop_dict):
     """
@@ -105,7 +111,7 @@ def main(db_filename, cl_suppress, geo_suppress, suppress_out, k_val):
     full_suppress_list = list(class_suppress)
     suppress_total = len(class_suppress)
     print 'Number of suppressed records due to class identification is', suppress_total
-    for k,v in prop_dict.iteritems():
+    for k, v in prop_dict.iteritems():
         if len(v) < k_val:
             full_suppress_list.extend(v)
     print 'Total number of records suppressed =', str(len(full_suppress_list))
@@ -141,10 +147,3 @@ if __name__ == '__main__':
     k_val = int(sys.argv[5])
 
     main(db_filename, cl_suppress, geo_suppress, suppress_out, k_val)
-
-
-
-
-
-
-
