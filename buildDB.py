@@ -13,15 +13,15 @@ the code.
 __author__ = 'waldo'
 
 from de_id_functions import *
-import sys
+import sys, pickle
 
 def splitDate(date):
     '''
     Remove the date from the time in the time signature while creating the main table. This replaces the call to
     splitDate(), which took a long time.
     '''
-    if 'T' in date:
-        point = date.index('T')
+    if ' ' in date:
+        point = date.index(' ')
         date = date[:point]
     return date
 
@@ -48,6 +48,7 @@ def sourceLoad(cursor, fname, tableName):
     except:
         pass
 
+    country_codes = {}
     with open(fname, "rU") as inFile:
         csvIn = csv.reader(inFile)
         row = csvIn.next()
@@ -67,36 +68,68 @@ def sourceLoad(cursor, fname, tableName):
         for row in csvIn:
             if (row[29] == 'instructor') or (row[29] == 'staff' ):
                 continue
+            #activate to exclude any record where the student never viewed the contents of the course
+            #if row[4] == '0':
+            #    continue
+
+            row[5] = str(int(float(row[5])))
+            #activate to exclude any record where the student never explored the contents of the course
+            #if row[5] == '0':
+            #    continue
+
+            #activate to exclude any record where the student did not complete the course
+            if row[6] == '0':
+                continue
+
             row[17] = splitDate(row[17])
             row[18] = splitDate(row[18])
             row[1] = idGen2(row[1], 'MHxPC14', idDict)
+
             if not (not (row[14] == 'NA') and not (row[14] < '1930') and not (row[14] > '2005')):
                 row[14] = ''
+            else:
+                row[14] = str(int(float(row[14])))
             if row[15] == 'NA':
                 row[15] = ''
+            if row[23] != '':
+                row[23] = str(int(float(row[23])))
+            else:
+                row[23] = '0'
+            if row[8] not in country_codes:
+                try:
+                    country_codes[row[8]] = pycountry.countries.get(alpha2=str(row[8])).name
+                except Exception as err:
+                    print "Err %s on : cc = %s" %(err, row[8])
+                    country_codes[row[8]] = str(row[8])
             trow = tuple(row)
             cursor.execute(tableInsert, trow)
 
+    return country_codes
 
 if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        print 'Usage: python buildDB csvFileName databaseName (verbose)'
+    if len(sys.argv) < 4:
+        print 'Usage: python buildDB csvFileName databaseName countryTableFileName (verbose)'
         sys.exit(1)
 
     fromFileName = sys.argv[1]
     dbFileName = sys.argv[2]
-    if len(sys.argv) > 3:
+    cTableFileName = sys.argv[3]
+    if len(sys.argv) > 4:
         verbose = True
     else:
         verbose = False
 
     c = dbOpen(dbFileName)
-    sourceLoad(c, fromFileName, 'source')
-    countryNamer(c, 'source', 'final_cc')
-    dbClose(c)
+    ccodes = sourceLoad(c, fromFileName, 'source')
+    pf = open(cTableFileName, 'w')
+    pickle.dump(ccodes, pf)
+    pf.close()
+    #countryNamer(c, 'source', 'cc_by_ip')
 
     if verbose:
         c.execute("SELECT name FROM sqlite_master WHERE type='table';")
         print (c.fetchall())
         c.execute("SELECT SUM(Count) FROM source")
         print (c.fetchall())
+
+    dbClose(c)

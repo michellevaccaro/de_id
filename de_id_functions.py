@@ -89,9 +89,11 @@ def countryNamer(cursor, tableName, countryCode):
         except Exception as err:
             print "Err %s on: cc=%s" % (err, row[0])
             cnameDict[row[0]]=str(row[0])
-    try: addColumn(cursor,tableName,countryCode+"_cname")
-    except: cursor.execute("UPDATE "+tableName+" SET "+countryCode+"_cname = 'NULL'")
-    dataUpdate(cursor,tableName,countryCode,cnameDict, True, countryCode+"_cname")
+        try:
+            addColumn(cursor,tableName,countryCode+"_cname")
+        except:
+            cursor.execute("UPDATE "+tableName+" SET "+countryCode+"_cname = 'NULL'")
+        dataUpdate(cursor,tableName,countryCode,cnameDict, True, countryCode+"_cname")
 
 
 def contImport(cursor, tableName, inFileName, varName1, varName2='continent'):

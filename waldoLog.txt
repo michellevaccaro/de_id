@@ -1,3 +1,22 @@
+12/4/15
+
+Considerable cleanup added to buildDB.py. Changed the building of the country-name from country codes (using the
+cc_by_ip field) from being a separate operation that did a 'Select' over the entire db to one where a dictionary
+is constructed during the building of the db itself (single pass); then saved that as a pickled dictionary rather than
+adding a separate column in to the database for each record. Note that each record already has a country-name associated
+with it; that name is different from the one that is given by pycountry in some instances, but only in terms of the
+spelling, never in terms of the identification.
+
+Made sure that all of the registered/viewed/explored/certified flags were integer values (explored was stored as floating
+point). For number of forum posts, changed the unmarked value to '0' rather than '' or 'NA' so that the binning could be
+made simpler.
+
+The date format had changed in such a way that we were not removing the times from the date/times; changed the
+splitDate() routine to account for the new format.
+
+Added code to buildDB.py that allows generating data bases for all students; for students who had at least viewed course
+content; for students who had at least explored the content; and for only students who had received a certificate.
+
 8/26
 
 Problem found. While the code in numeric_generalization.py creates a table entry for nforum_posts of
