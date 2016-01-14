@@ -1,3 +1,40 @@
+1/12/16
+
+Have made considerable changes to the numeric_generalization.py functions.
+
+Changed findBinEndpoints to assume that the first argument was a list of pairs of (value, count), sorted in ascending
+order by value, that need to be binned. If there are non-entry or other forms of errors to deal with, that is done
+prior to calling the routine.
+
+Also totaled up the number of entries prior to building the bins, and then when a bin size is reached subtract the
+number of entries in the bin from the total number to determine if there are sufficient entries for another bin; if not
+the last entries are added to the last bin (and the bin endpoint is changed). The end result is to do the
+endpoint determination in one pass rather than two.
+
+Simplified createConversionDict to work on one pass through the set of values to be binned.
+
+1/1/16
+
+Beginning to re-work some of the generalization code that Olivia wrote. First is to change the code for findBinEndpoints
+so that it can assume that it is passed a list of integer pairs, where the first entry in each pair is the value to be
+generalized, and the second is the number of those values. It is also assumed that the list is in ascending order on the
+first field. So for year-of-birth it will be earlier years to later years; for number of forum posts it will be lowest
+number of posts to highest. Part of the idea here is to make findBinEndpoints a very general function that doesn't know
+what kind of data it is working on, and especially not the special cases (such as values for un-entered data) that it is
+trying to deal with. Those will be taken care of at the level of the functions that call this one.
+
+Changed the code to not build a table in the database, but to take the dictionaries that were built mapping the value of
+a generalized value to the range/mean and simply pickle that dictionary. This required adding two new command-line arguments,
+the names of the files for the pickle.
+
+Also realized that the current generalization code will include records that have previously been determined to be
+suppressed by the combination of students/class combination; this may not change any of the results of de-identification,
+but it might be interesting to look at what happens if the binning is only done with those records that remain after
+this suppression is done.
+
+Currently the code crashes in createConversionDict, to which minimal (no?) changes were made. Need to take a look at what
+that function is doing.
+
 12/4/15
 
 Considerable cleanup added to buildDB.py. Changed the building of the country-name from country codes (using the

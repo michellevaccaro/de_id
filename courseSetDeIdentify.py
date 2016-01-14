@@ -2,7 +2,7 @@
 
 __author__ = 'waldo'
 
-from de_id_functions import *
+from de_id_functions import dbOpen, dbClose
 import sys
 import random
 import pickle
@@ -220,7 +220,7 @@ def dropClass(classlist, studentlist, classdict, c, s_set, finddropclass):
     return
 
 
-def main(dbName, k_val, suppress_method):
+def main(c, k_val, suppress_method):
     fname = str(k_val)
     if suppress_method == 'R':
         use_suppress = randomdropclass
@@ -228,12 +228,10 @@ def main(dbName, k_val, suppress_method):
     else :
         use_suppress = participationdropclass
         fname = 'classSuppressSetP'+ fname
-
-    c = dbOpen(dbName)
-    try:
-        c.execute('Create index users on source (user_id)')
-    except:
-        pass
+    #try:
+    #    c.execute('Create index users on source (user_id)')
+    #except:
+    #    pass
     c.execute('SELECT user_id, course_id FROM source ORDER BY user_id')
     ulist = c.fetchall()
     cdict = buildCDict(ulist)
@@ -257,8 +255,11 @@ if __name__ == '__main__':
         print 'where P is suppression on level of participation and R is random'
     dbName = sys.argv[1]
     k_val = int(sys.argv[2])
-    suppress_method = 'P'
     if sys.argv[3] == 'R':
         suppress_method = 'R'
+    else:
+        suppress_method = "P"
 
-    main(dbName, k_val, suppress_method)
+    c = dbOpen(dbName)
+
+    main(c, k_val, suppress_method)
