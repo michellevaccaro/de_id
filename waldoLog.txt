@@ -1,3 +1,14 @@
+1/15/16
+
+Added code to numeric_generalization that will allow passing in the bin sizes as arguments. If no numbers are passed in,
+or if they are not integers, the size of the bin will default to the size set in the code (and, if an invalid entry was
+passed in, an error message will be printed out.
+
+Note that we still don't deal with the case in which the minimum bin size is too large for the number of entries that we
+have; in such a case the bin should be everything.
+
+Updated the pydoc for the functions in numeric_generalization to reflect the new code.
+
 1/12/16
 
 Have made considerable changes to the numeric_generalization.py functions.
