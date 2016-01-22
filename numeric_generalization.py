@@ -47,7 +47,7 @@ def findBinEndpoints(qry, maxbinsize):
         valuedict[qry[i][0]] = qry[i][1]
         # if running total of bins exceeds bin size, add as endpoint and start again
         # only if the remaining buckets have enough to also create a bin
-        if runningtotal >= maxbinsize and (remaining_recs - runningtotal) >= maxbinsize:
+        if runningtotal >= maxbinsize and (remaining_r,ecs - runningtotal) >= maxbinsize:
             toappend = qry[i][0]
             binbreaks.append(toappend)
             binmeans.append(float(sum(k * v for k, v in valuedict.items())) / sum(valuedict.values()))
