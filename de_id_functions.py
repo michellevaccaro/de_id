@@ -54,7 +54,7 @@ def dbOpen(db):
     conn = sqlite3.connect(db)
     conn.text_factory = str
     c = conn.cursor()
-    c.execute('Pragma cache_size = 2000000')
+    c.execute('Pragma cache_size = 1999999')
     return c
 
 def dbClose(cursor, closeFlag=True):

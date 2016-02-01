@@ -32,21 +32,21 @@ header_pr = ['Course ID',
              'Reason for Taking Course'
              ]
 
-loe_dict = { 'nan' : 'ug',
-             'NA': 'ug',
-             'm': 'pg',
-             'p': 'pg',
-             'b': 'pg',
-             'a': 'ug',
-             'hs': 'ug',
-             'jhs': 'ug',
-             'el': 'ug',
-             'none':'ug',
-             'other':'ug',
-             '': 'ug',
-             'p_se':'pg',
-             'p_oth': 'pg'
-             }
+loe_dict = {'nan': 'ug',
+            'NA': 'ug',
+            'm': 'pg',
+            'p': 'pg',
+            'b': 'pg',
+            'a': 'ug',
+            'hs': 'ug',
+            'jhs': 'ug',
+            'el': 'ug',
+            'none': 'ug',
+            'other': 'ug',
+            '': 'ug',
+            'p_se': 'pg',
+            'p_oth': 'pg'
+            }
 
 wfields = ['course_id',
            'user_id',
@@ -67,6 +67,7 @@ wfields = ['course_id',
            'prs_reason_lc'
            ]
 
+
 def build_select_string(tablename):
     """
     Build a string to be used in an SQL select statement
@@ -80,6 +81,7 @@ def build_select_string(tablename):
     retstr = "Select " + fieldstr + ' from ' + tablename
     return retstr
 
+
 def get_pickled_table(filename):
     """
     Reads in a dictionary that has been saved to the named file using pickle.dump()
@@ -90,6 +92,7 @@ def get_pickled_table(filename):
         supressdict = pickle.load(pfile)
         pfile.close()
         return supressdict
+
 
 def build_numeric_dict(cr, table_name):
     """
@@ -120,7 +123,7 @@ def init_csv_file(fhandle):
     return outf
 
 
-def main(db_file_name, outname, csuppress_file_name, cg_file_name):
+def main(db_file_name, outname, csuppress_file_name, cg_file_name, yobfname, binfname):
     """
     The main routine that will create and write the final de-identified data set
 
@@ -142,8 +145,10 @@ def main(db_file_name, outname, csuppress_file_name, cg_file_name):
     csvout = init_csv_file(outf)
     csuppress = get_pickled_table(csuppress_file_name)
     cgtable = get_pickled_table(cg_file_name)
-    yob_dict = build_numeric_dict(c, 'YoB_bins')
-    forum_dict = build_numeric_dict(c, 'nforum_posts_bins')
+    yob_dict = get_pickled_table(yobfname)
+    forum_dict = get_pickled_table(binfname)
+    #yob_dict = build_numeric_dict(c, 'YoB_bins')
+    #forum_dict = build_numeric_dict(c, 'nforum_posts_bins')
     c.execute(build_select_string('source'))
     supressed_records = len(csuppress)
     encoding_errors = 0
@@ -169,7 +174,7 @@ def main(db_file_name, outname, csuppress_file_name, cg_file_name):
                     l.insert(7, 'NA')
             if (l[13] == '') or (l[13] == '9999.0'):
                 l[13] = '0'
-                l.insert(14,'0')
+                l.insert(14, '0')
             else:
                 nf = l[13][:-2]
                 nf_range = forum_dict[nf][0]
@@ -195,14 +200,17 @@ if __name__ == '__main__':
     of the de-identified csv file, and pass those names on to the main() routine,
     which does all of the actual work.
 
-    Usage: buildDeIdentifiedCSV databaseIn CSVfileOut recordSupressionFile countryGeneralizationFile
+    Usage: buildDeIdentifiedCSV databaseIn CSVfileOut recordSupressionFile countryGeneralizationFile YoBbinfile postbinfile
     """
-    if len(sys.argv) < 5:
-        print 'Usage: buildDeIdentifiedCSV databaseIn CSVfileOut recordSuppressFile countryGeneralizationFile'
+    if len(sys.argv) < 7:
+        print 'Usage: buildDeIdentifiedCSV databaseIn CSVfileOut recordSuppressFile countryGeneralizationFile ' \
+              'YoBbinfile postbinfile'
         sys.exit(1)
     db_file_name = sys.argv[1]
     outname = sys.argv[2]
     csuppress_file_name = sys.argv[3]
     cg_file_name = sys.argv[4]
+    yobfilename = sys.argv[5]
+    postfilename = sys.argv[6]
 
-    main(db_file_name, outname, csuppress_file_name, cg_file_name)
+    main(db_file_name, outname, csuppress_file_name, cg_file_name, yobfilename, postfilename)

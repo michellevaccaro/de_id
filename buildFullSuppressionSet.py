@@ -26,17 +26,21 @@ def get_LOE(level):
 
 
 def get_YOB(for_year, yob_gentable):
-    for_year = for_year[:-2]
+    #for_year = for_year[:-2]
+    if for_year != '':
+        y = int(for_year)
     try:
-        return yob_gentable[for_year][0]
+        return yob_gentable[y][0]
     except:
+        #print 'YoB', for_year, 'not in YoB gentable'
         return for_year
 
 
 def get_nforum(posts, post_table):
-    k = posts[:-2]
-    if k == '9999':
-        return '0'
+    #k = posts[:-2]
+    #if k == '9999':
+    #    return '0'
+    k = int(posts)
     try:
         return post_table[k][0]
     except:
@@ -101,10 +105,12 @@ def make_count_dict(prop_dict):
     return ret_dict
 
 
-def main(db_filename, cl_suppress, geo_suppress, suppress_out, k_val):
-    cr = dbOpen(db_filename)
-    yob_gentable = build_numeric_dict(cr, 'YoB_bins')
-    forum_gentable = build_numeric_dict(cr, 'nforum_posts_bins')
+def main(cr, cl_suppress, geo_suppress, yob_fname, forum_fname, suppress_out, k_val):
+    #cr = dbOpen(db_filename)
+    yob_gentable = get_pickled_table(yob_fname)
+    forum_gentable = get_pickled_table(forum_fname)
+    #yob_gentable = build_numeric_dict(cr, 'YoB_bins')
+    #forum_gentable = build_numeric_dict(cr, 'nforum_posts_bins')
     cgtable = get_pickled_table(geo_suppress)
     class_suppress = get_pickled_table(cl_suppress)
     prop_dict = make_list_dict(cr, yob_gentable, forum_gentable, cgtable, class_suppress)
@@ -136,14 +142,18 @@ if __name__ == '__main__':
     if other quasi-identifiers are added to the output set, this program will need to be modified to take into account
     those identifiers.
     """
-    if len(sys.argv) < 5:
-        print 'Useage: buildFullSuppressionSet.py databaseFile classSuppress geoSuppress NewSuppress k-anonValue'
+    if len(sys.argv) < 8:
+        print 'Useage: buildFullSuppressionSet.py databaseFile classSuppress geoSuppress ' \
+              'yobFile forumFile NewSuppress k-anonValue'
         sys.quit(1)
 
     db_filename = sys.argv[1]
+    cr = dbOpen(db_filename)
     cl_suppress = sys.argv[2]
     geo_suppress = sys.argv[3]
-    suppress_out = sys.argv[4]
-    k_val = int(sys.argv[5])
+    yob_fname = sys.argv[4]
+    forum_fname = sys.argv[5]
+    suppress_out = sys.argv[6]
+    k_val = int(sys.argv[7])
 
-    main(db_filename, cl_suppress, geo_suppress, suppress_out, k_val)
+    main(cr, cl_suppress, geo_suppress, yob_fname, forum_fname, suppress_out, k_val)

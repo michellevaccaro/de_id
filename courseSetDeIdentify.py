@@ -124,7 +124,7 @@ def randomdropclass(student, classlist, c):
     return classlist[i]
 
 
-def participationdropclass(student, classlist, c):
+def participationdropclass(student, classlist, studentrecords):
     """
     Return a course associated with the given student in which the student did the least.
 
@@ -143,9 +143,6 @@ def participationdropclass(student, classlist, c):
     :param c: a cursor into the database
     :return: the name of a class in classlist
     """
-    cmd = 'Select * from source where user_id = "' + student + '"'
-    c.execute(cmd)
-    studentrecords = c.fetchall()
     todrop = None
     for sr in studentrecords:
         if sr[0] not in classlist:
@@ -154,11 +151,11 @@ def participationdropclass(student, classlist, c):
             todrop = sr
             continue
         comprec = sr
-        if todrop[4] > comprec[4]:
+        if todrop[3] > comprec[3]:
+            todrop = comprec
+        elif todrop[4] > comprec[4]:
             todrop = comprec
         elif todrop[5] > comprec[5]:
-            todrop = comprec
-        elif todrop[6] > comprec[6]:
             todrop = comprec
 
     return todrop[0]
@@ -213,25 +210,28 @@ def dropClass(classlist, studentlist, classdict, c, s_set, finddropclass):
     i = 1
     for student in studentlist:
         cl = coursestringtolist(classlist)
+        sel_string = "Select course_id, user_id, registered, viewed, explored, certified from source " \
+                     "indexed by user_id_idx where user_id = '" + student +"'"
+        c.execute(sel_string)
+        studentrecords = c.fetchall()
         while not checkthreshold(cl, classdict, student):
-            dropclass = finddropclass(student, cl, c)
+            dropclass = finddropclass(student, cl, studentrecords)
             add2suppressionset(dropclass, student, s_set)
             cl.remove(dropclass)
     return
 
 
-def main(c, k_val, suppress_method):
+def main(c, k_val, suppress_method, outname):
     fname = str(k_val)
     if suppress_method == 'R':
         use_suppress = randomdropclass
-        fname = 'classSuppressSetR'+ fname
     else :
         use_suppress = participationdropclass
-        fname = 'classSuppressSetP'+ fname
-    #try:
-    #    c.execute('Create index users on source (user_id)')
-    #except:
-    #    pass
+
+    try:
+        c.execute("Create Index user_id_idx on source ('user_id')")
+    except:
+        pass
     c.execute('SELECT user_id, course_id FROM source ORDER BY user_id')
     ulist = c.fetchall()
     cdict = buildCDict(ulist)
@@ -243,7 +243,7 @@ def main(c, k_val, suppress_method):
             dropClass(classlist, cdict[classlist], cdict, c, suppressionset, use_suppress)
     print count
     print len(suppressionset)
-    sfile = open(fname, 'w')
+    sfile = open(outname, 'w')
     pickle.dump(suppressionset, sfile)
     sfile.close()
     dbClose(c)
@@ -254,12 +254,14 @@ if __name__ == '__main__':
         print 'Usage: courseSetDeidentify.py dbname k-value {P,R}'
         print 'where P is suppression on level of participation and R is random'
     dbName = sys.argv[1]
+    outname = 'courseSuppressSet'
     k_val = int(sys.argv[2])
     if sys.argv[3] == 'R':
         suppress_method = 'R'
     else:
         suppress_method = "P"
+    outname = outname + str(k_val) + suppress_method
 
     c = dbOpen(dbName)
 
-    main(c, k_val, suppress_method)
+    main(c, k_val, suppress_method, outname)

@@ -104,7 +104,7 @@ def get_pickled_table(filename):
 
 def build_numeric_dict(cr, table_name):
     """
-    Build a generalization dictioclassSnary from a table.
+    Build a generalization dictionary from a table.
 
     This assumes the table has keys that are numeric values and values that are ranges that the values
     map to for generalization.
