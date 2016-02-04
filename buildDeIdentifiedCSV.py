@@ -123,7 +123,7 @@ def init_csv_file(fhandle):
     return outf
 
 
-def main(db_file_name, outname, csuppress_file_name, cg_file_name, yobfname, binfname):
+def main(full_list, outname, csuppress_file_name, cg_file_name, yobfname, binfname):
     """
     The main routine that will create and write the final de-identified data set
 
@@ -140,19 +140,15 @@ def main(db_file_name, outname, csuppress_file_name, cg_file_name, yobfname, bin
     from country to region (if needed) for anonymization
     :return: None
     """
-    c = dbOpen(db_file_name)
     outf = open(outname, 'w')
     csvout = init_csv_file(outf)
     csuppress = get_pickled_table(csuppress_file_name)
     cgtable = get_pickled_table(cg_file_name)
     yob_dict = get_pickled_table(yobfname)
     forum_dict = get_pickled_table(binfname)
-    #yob_dict = build_numeric_dict(c, 'YoB_bins')
-    #forum_dict = build_numeric_dict(c, 'nforum_posts_bins')
-    c.execute(build_select_string('source'))
     supressed_records = len(csuppress)
     encoding_errors = 0
-    for rec in c.fetchall():
+    for rec in full_list:
         if rec[0] + rec[1] not in csuppress:
             l = list(rec)
             l[4] = cgtable[l[4]]
@@ -164,7 +160,7 @@ def main(db_file_name, outname, csuppress_file_name, cg_file_name, yobfname, bin
                 l[6] = ''
                 l.insert(7, '')
             else:
-                year = l[6][:-2]
+                year = int(l[6])
                 yrange = yob_dict[year][0]
                 ymean = yob_dict[year][1]
                 l[6] = yrange
@@ -176,7 +172,7 @@ def main(db_file_name, outname, csuppress_file_name, cg_file_name, yobfname, bin
                 l[13] = '0'
                 l.insert(14, '0')
             else:
-                nf = l[13][:-2]
+                nf = int(l[13])
                 nf_range = forum_dict[nf][0]
                 nf_mean = forum_dict[nf][1]
                 l[13] = nf_range
@@ -207,10 +203,14 @@ if __name__ == '__main__':
               'YoBbinfile postbinfile'
         sys.exit(1)
     db_file_name = sys.argv[1]
+    cr = dbOpen(db_file_name)
+    cr.execute(build_select_string('source'))
+    full_list = cr.fetchall()
+
     outname = sys.argv[2]
     csuppress_file_name = sys.argv[3]
     cg_file_name = sys.argv[4]
     yobfilename = sys.argv[5]
     postfilename = sys.argv[6]
 
-    main(db_file_name, outname, csuppress_file_name, cg_file_name, yobfilename, postfilename)
+    main(full_list, outname, csuppress_file_name, cg_file_name, yobfilename, postfilename)
