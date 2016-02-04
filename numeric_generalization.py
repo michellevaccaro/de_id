@@ -50,7 +50,7 @@ def findBinEndpoints(qry, maxbinsize):
         if runningtotal >= maxbinsize and (remaining_recs - runningtotal) >= maxbinsize:
             toappend = qry[i][0]
             binbreaks.append(toappend)
-            binmeans.append(float(sum(k * v for k, v in valuedict.items())) / sum(valuedict.values()))
+            binmeans.append(float(sum(k * int(v) for k, v in valuedict.items())) / sum(valuedict.values()))
             remaining_recs -= runningtotal
             runningtotal = 0
             valuedict = {}

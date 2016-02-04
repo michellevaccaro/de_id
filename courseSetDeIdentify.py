@@ -254,7 +254,7 @@ if __name__ == '__main__':
         print 'Usage: courseSetDeidentify.py dbname k-value {P,R}'
         print 'where P is suppression on level of participation and R is random'
     dbName = sys.argv[1]
-    outname = 'courseSuppressSet'
+    outname = 'classSuppressSet'
     k_val = int(sys.argv[2])
     if sys.argv[3] == 'R':
         suppress_method = 'R'

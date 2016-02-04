@@ -15,7 +15,7 @@ wfields = ['course_id',
            'viewed',
            'explored',
            'certified',
-           'final_cc_cname',
+           'cc_by_ip',
            'LoE',
            "YoB",
            'gender',
@@ -40,7 +40,7 @@ hfields = ['course_id',
            'viewed',
            'explored',
            'certified',
-           'final_cc_cname',
+           'cc_by_ip',
            'LoE',
            'YoB_bin',
            "YoB",
@@ -131,20 +131,21 @@ def init_csv_file(fhandle):
     return outf
 
 
-def main(db_file_name, outname, class_suppress_name, country_table_name):
+def main(user_course_list, outname, class_suppress_name, country_table_name, yobFile, postFile):
     global supressed_records, encoding_errors
     csuppress = get_pickled_table(class_suppress_name)
     cgtable = get_pickled_table(country_table_name)
-    c = dbOpen(db_file_name)
+    #c = dbOpen(db_file_name)
     outf = open(outname, 'w')
     csvout = init_csv_file(outf)
-    yob_dict = build_numeric_dict(c, 'YoB_bins')
-    forum_dict = build_numeric_dict(c, 'nforum_posts_bins')
-    c.execute(build_select_string('source'))
-    rec_list = c.fetchall()
+    yob_dict = get_pickled_table(yobFile)
+    forum_dict = get_pickled_table(postFile)
+
+    #c.execute(build_select_string('source'))
+    #rec_list = c.fetchall()
     supressed_records = len(csuppress)
     encoding_errors = 0
-    for rec in rec_list:
+    for rec in user_course_list:
         if rec[0] + rec[1] not in csuppress:
             l = list(rec)
             l[6] = cgtable[l[6]]
@@ -154,10 +155,10 @@ def main(db_file_name, outname, class_suppress_name, country_table_name):
                 l[7] = 'ug'
             l.insert(9, l[8])
             if (l[8] != ''):
-                l[8] = yob_dict[l[8]]
+                l[8] = yob_dict[int(l[8])]
             l.insert(19, l[18])
             if l[18] != '':
-                l[18] = forum_dict[l[18]]
+                l[18] = forum_dict[int(l[18])]
             try:
                 csvout.writerow(l)
             except:
@@ -173,19 +174,26 @@ if __name__ == '__main__':
     and the mapping dictionaries for the various generalizers, and then create a .csv
     file that is de-identified.
 
-    Usage: buildDeIdentifiedCSV databaseIn CSVfileOut courseSupressionFile countryGeneralizationFile
+    Usage: buildDeIdentifiedCSV databaseIn CSVfileOut courseSupressionFile countryGeneralizationFile yobbinFile postbinFile
     """
 
-    if len(sys.argv) < 5:
-        print 'Usage: buildDeIdentifiedCSV databaseIn CSVfileOut courseSupressionFile countryGeneralizationFile'
+    if len(sys.argv) < 7:
+        print 'Usage: buildDeIdentifiedCSV databaseIn CSVfileOut courseSupressionFile countryGeneralizationFile ' \
+              'yobbinFile postbinFile'
         sys.exit(1)
 
     db_file_name = sys.argv[1]
+    cr = dbOpen(db_file_name)
+    cr.execute(build_select_string('source'))
+    full_list = cr.fetchall()
+
     outname = sys.argv[2]
     class_suppress_name = sys.argv[3]
     country_table_name = sys.argv[4]
+    yobFile = sys.argv[5]
+    postFile = sys.argv[6]
 
-    main(db_file_name, outname, class_suppress_name, country_table_name)
+    main(full_list, outname, class_suppress_name, country_table_name, yobFile, postFile)
 
 
     print 'number of records suppressed for k-anonymity =', supressed_records
