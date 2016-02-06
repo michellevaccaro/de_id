@@ -10,10 +10,11 @@ bin_size = ['05', '10', '15', '20', '25']
 k_values = [3, 4, 5, 6]
 
 cr = dbOpen('year.db')
-geo_suppress = 'countryDict'
+geo_base = 'countryGen'
 for k_val in k_values:
     for s in bin_size:
         class_supp = 'classSuppressSet' + str(k_val) + 'P'
+        geo_suppress = geo_base + s + 'k'
         yob_fname = 'yobbin' + s + 'k'
         forum_fname = 'postbin' + s + 'k'
         suppress_out = 'fullSuppress'+ s + s + str(k_val) + 'P'

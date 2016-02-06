@@ -13,11 +13,12 @@ cr = dbOpen('year.db')
 cr.execute(csvBuilder.build_select_string('source'))
 user_course_list = cr.fetchall()
 
-country_file = 'countryDict'
+country_base = 'countryGen'
 
 for k in k_vals:
     for s in bin_size:
         class_supp = 'classSuppressSet' + str(k) + 'P'
+        country_file = country_base + s + 'k'
         yob_fname = 'yobbin'+ s + 'k'
         fbin_fname = 'postbin' + s + 'k'
         full_suppress = 'fullSuppress' + s + s + str(k) + 'P'
