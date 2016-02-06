@@ -170,10 +170,11 @@ def printtables(countrydist, gentable, gensizetable):
         print country, value
 
 
-def main(dbname, outname, ccfname, print_table = False):
-    c = dbOpen(dbname)
-    c.execute('Select cc_by_ip from source')
-    countrydist = builddistdict(c.fetchall())
+def main(cc_list, outname, ccfname, bin_size, print_table = False):
+    #c = dbOpen(dbname)
+    #c.execute('Select cc_by_ip from source')
+    geo_binsize = bin_size
+    countrydist = builddistdict(cc_list)
     country_codes = countrydist.keys()
     cc_to_countries = build_cc_to_country(country_codes)
     country2cont = readcountrycont(ccfname)
@@ -187,18 +188,23 @@ def main(dbname, outname, ccfname, print_table = False):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 4:
-        print 'Usage: buildcountrygeneralizer databaseFile outputFile country_to_continent_file {p}'
+    if len(sys.argv) < 5:
+        print 'Usage: buildcountrygeneralizer databaseFile outputFile country_to_continent_file bin_size {p}'
         exit(1)
 
     dbname = sys.argv[1]
+    cr = dbOpen(dbname)
+    cr.execute('Select cc_by_ip from source')
+    cc_list = cr.fetchall()
+
     outname = sys.argv[2]
     ccfname = sys.argv[3]
+    binsize = int(sys.argv[4])
 
-    if (len(sys.argv) > 4) and (sys.argv[4] == 'p'):
+    if (len(sys.argv) > 5) and (sys.argv[5] == 'p'):
         print_table = True
-    else :
+    else:
         print_table = False
 
-    main(dbname, outname, ccfname, print_table)
+    main(cc_list, outname, ccfname, print_table, binsize)
 
