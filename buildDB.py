@@ -78,8 +78,8 @@ def sourceLoad(cursor, fname, tableName):
             #    continue
 
             #activate to exclude any record where the student did not complete the course
-            if row[6] == '0':
-                continue
+            #if row[6] == '0':
+            #    continue
 
             row[17] = splitDate(row[17])
             row[18] = splitDate(row[18])

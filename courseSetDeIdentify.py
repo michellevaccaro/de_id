@@ -221,19 +221,19 @@ def dropClass(classlist, studentlist, classdict, c, s_set, finddropclass):
     return
 
 
-def main(c, k_val, suppress_method, outname):
-    fname = str(k_val)
+def main(ulist, c, k_val, suppress_method, outname):
+    #fname = str(k_val)
     if suppress_method == 'R':
         use_suppress = randomdropclass
     else :
         use_suppress = participationdropclass
 
-    try:
-        c.execute("Create Index user_id_idx on source ('user_id')")
-    except:
-        pass
-    c.execute('SELECT user_id, course_id FROM source ORDER BY user_id')
-    ulist = c.fetchall()
+    #try:
+    #    c.execute("Create Index user_id_idx on source ('user_id')")
+    #except:
+    #    pass
+    #c.execute('SELECT user_id, course_id FROM source ORDER BY user_id')
+    #ulist = c.fetchall()
     cdict = buildCDict(ulist)
     count = 0
     suppressionset = set([])
@@ -246,7 +246,6 @@ def main(c, k_val, suppress_method, outname):
     sfile = open(outname, 'w')
     pickle.dump(suppressionset, sfile)
     sfile.close()
-    dbClose(c)
 
 
 if __name__ == '__main__':
@@ -263,5 +262,11 @@ if __name__ == '__main__':
     outname = outname + str(k_val) + suppress_method
 
     c = dbOpen(dbName)
-
-    main(c, k_val, suppress_method, outname)
+    try:
+        c.execute("Create Index user_id_idx on source ('user_id')")
+    except:
+        pass
+    c.execute('SELECT user_id, course_id FROM source ORDER BY user_id')
+    user_class_list = c.fetchall()
+    main(user_class_list, k_val, suppress_method, outname)
+    dbClose(c)
