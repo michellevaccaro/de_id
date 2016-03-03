@@ -10,10 +10,11 @@ k-anonymity (which is a hard-coded value at the moment, = 50).
 Writes out a file with the name supplied as a command line parameter that is the pickle of
 the generalization table.
 
-Usage: buildcountrygeneralizer.py databaseFile generalizationFile {'p'}
+Usage: buildcountrygeneralizer.py databaseFile generalizationFile bin_size {'p'}
 where
     databaseFile : name of the file containing the database
     generalizationFile : name of the generalization table file to be written
+    bin_size: an integer that is the minimum bin size to trigger generalization
     optional 'p' : useful to see what is happening; will print the generalization file,
     the mapping of countries to counts, and the mapping of regions to counts, on standard
     out.

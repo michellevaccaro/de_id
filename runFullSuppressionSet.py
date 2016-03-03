@@ -6,7 +6,8 @@ identification based on the classes for which a user enrolled.
 import buildFullSuppressionSet
 from de_id_functions import dbOpen
 
-bin_size = ['05', '10', '15', '20', '25']
+#bin_size = ['05', '10', '15', '20', '25']
+bin_size = ['00']
 k_values = [3, 4, 5, 6]
 
 cr = dbOpen('year.db')
