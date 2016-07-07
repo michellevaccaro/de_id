@@ -9,7 +9,7 @@ import pandas as pd
 Bin a set of numeric values so that at least n entities are within each bin. In particular,
 this code will take the Year of Birth (YoB) and the number of forum posts (nforum_posts) values
 and produce bins with a particular range and calculate the mean for that range.  This code is
-improved in orer to bin values together in such a way that minimizes the distortion of the mean
+improved in order to bin values together in such a way that minimizes the distortion of the mean
 of the post-binned values.
 
 The value '9999' (or '9999.0') is used as a marked value to show that there is nothing associated

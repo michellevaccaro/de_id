@@ -155,7 +155,7 @@ Step 4: Build the country generalization file
 Next comes generalizing those records where the k-anonymity of the user is revealed by their location. This is done
 by running
 
->   python buildcountrygeneralizer dbfile outputFile country_to_continent_file {p}
+>   python buildcountrygeneralizer.py dbfile outputFile country_to_continent_file binsize {p}
 
 where dbfile is the name of the database file, outputFile is the file to produce, and country_to_contenent_file is a 
 file mapping from particular countries to regions. If 'p' is added, a table showing the mappings used will be produced.
