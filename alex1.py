@@ -41,7 +41,6 @@ def main():
     # q: how to make this step optional?
     db.execute('Select cc_by_ip from source')
     cc_list = db.fetchall()
-    # q: readme documentation doesn't mention a number to be inputted for binsize??
     buildcountrygeneralizer.main(cc_list, config.outputCountryGeneralizeFilename, config.country_to_continent_file, config.table_mappings_show, config.binsize)
     
     # Step 5 builds the full suppression set
