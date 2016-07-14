@@ -15,9 +15,9 @@ Take dbname, k value, bin size as overall arguments
 """
 def main():
     # Step 1 creates the database file
-    db = dbOpen(config.databaseFile)
+    db = de_id_functions.dbOpen(config.databaseFile)
     # buildDB config.csvFileIn config.databaseFileOut config.countryTableFileName
-    ccodes = sourceLoad(db, fromFileName, 'source')
+    ccodes = buildDB.sourceLoad(db, fromFileName, 'source')
     pf = open(config.countryTableFileName, 'w')
     pickle.dump(ccodes, pf)
     pf.close()
