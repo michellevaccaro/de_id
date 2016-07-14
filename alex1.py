@@ -50,3 +50,5 @@ def main():
     db.execute(build_select_string('source'))
     full_list = db.fetchall()
     buildDeIdentifiedCSV.main(full_list, config.CSV_fileout, config.NewSuppress, config.outputCountryGeneralizeFilename, config.yearBinFileName, config.postBinFilename)
+
+main()
