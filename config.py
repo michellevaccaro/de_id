@@ -9,7 +9,7 @@ k_value = 5
 outname = "ClassSuppress"
 # anonymise by P for preferring dropping by participation 
 # and R indicates anonymizing by random drops.
-anonymise_by = P
+anonymise_by = "P"
 # Needed for Step 3: Generate bin files for numeric quasi-identifiers 
 # (in particular, YoB and Forum Posts)
 yearBinFileName = "yearBinFile"
