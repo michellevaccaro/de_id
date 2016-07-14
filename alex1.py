@@ -17,7 +17,7 @@ def main():
     # Step 1 creates the database file
     db = de_id_functions.dbOpen(config.databaseFile)
     # buildDB config.csvFileIn config.databaseFileOut config.countryTableFileName
-    ccodes = buildDB.sourceLoad(db, fromFileName, 'source')
+    ccodes = buildDB.sourceLoad(db, config.csvFileIn, 'source')
     pf = open(config.countryTableFileName, 'w')
     pickle.dump(ccodes, pf)
     pf.close()
