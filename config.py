@@ -21,7 +21,7 @@ Post_bin_size = 5000
 outputCountryGeneralizeFilename = "CountryGeneralizeOutput"
 country_to_continent_file = "country_continent"
 # want table produced of the mappings produced? put a p below
-table_mappings_show = p
+table_mappings_show = "p"
 # Needed for Step 5: Building the full suppression set
 NewSuppress = "GeneralSuppressionFile"
 # Needed for Step 6: Building the final de-identified CSV data set
