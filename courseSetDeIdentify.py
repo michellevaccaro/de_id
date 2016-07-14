@@ -268,5 +268,5 @@ if __name__ == '__main__':
         pass
     c.execute('SELECT user_id, course_id FROM source ORDER BY user_id')
     user_class_list = c.fetchall()
-    main(user_class_list, k_val, suppress_method, outname)
+    main(user_class_list, c, k_val, suppress_method, outname)
     dbClose(c)

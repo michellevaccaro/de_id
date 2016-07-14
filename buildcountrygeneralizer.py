@@ -172,8 +172,6 @@ def printtables(countrydist, gentable, gensizetable):
 
 
 def main(cc_list, outname, ccfname, bin_size, print_table = False):
-    #c = dbOpen(dbname)
-    #c.execute('Select cc_by_ip from source')
     geo_binsize = bin_size
     countrydist = builddistdict(cc_list)
     country_codes = countrydist.keys()
