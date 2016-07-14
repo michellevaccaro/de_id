@@ -29,7 +29,7 @@ def main():
         pass
     db.execute('SELECT user_id, course_id FROM source ORDER BY user_id')
     user_class_list = db.fetchall()
-    courseSetDeIdentifyMain(user_class_list, config.k_value, config.anonymise_by, config.outname)
+    courseSetDeIdentifyMain(user_class_list, db, config.k_value, config.anonymise_by, config.outname)
 
     # Step 3 generates bin files for quasi-identifiers
     year_bin_file = open(config.yearBinFileName, 'w')
