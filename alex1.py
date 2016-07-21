@@ -35,7 +35,7 @@ def main():
     year_bin_file = open(config.yearBinFileName, 'w')
     post_bin_file = open(config.postBinFilename, 'w')
     # need to close the above?
-    numeric_generalization_v2.main(db, year_bin_file)
+    numeric_generalization_v2.main(db, year_bin_file, post_bin_file)
 
     # Step 4 builds the country generalization files; 
     # q: how to make this step optional?
