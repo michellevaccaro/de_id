@@ -127,7 +127,7 @@ def main(c, year_bin_file, post_bin_file):
     global qry, endpts, year_conversion, nforumposts_conversion
     ########################################################
     # Bin years of birth
-    c.execute("SELECT YoB, COUNT(*) as \'num\', SUM(*) as \'sum\' FROM " + table + " GROUP BY YoB")
+    c.execute("SELECT YoB, COUNT(*) as \'num\', SUM(YoB) as \'sum\' FROM " + table + " GROUP BY YoB")
     qry = c.fetchall()
     # store all first pair, which will be the sum total of all the records with no entered YoB
     empty = qry[0]
@@ -160,7 +160,7 @@ def main(c, year_bin_file, post_bin_file):
     ########################################################
     # Bin number of forum posts
     # Replace all values of nforum_posts that are blank with a temporary 9999
-    c.execute("SELECT nforum_posts, COUNT(*) as \'num\', SUM(*) as \'sum\' FROM " + table + " GROUP BY nforum_posts ORDER BY nforum_posts")
+    c.execute("SELECT nforum_posts, COUNT(*) as \'num\', SUM(nforum_posts) as \'sum\' FROM " + table + " GROUP BY nforum_posts ORDER BY nforum_posts")
     qry = c.fetchall()
     try:
         qry = [(int(z[0]), z[1]) for z in qry]  # convert string floats to ints in qry count
