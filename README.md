@@ -50,7 +50,7 @@ obliterated.
 *********************
 
 1) Utility values
-   This term is taken from a Cynthia Dwork (Microsoft Research)
+   This term is taken from a Cynthia Dwork (then Microsoft Research, now Harvard)
    paper. The general idea is to have some key variables that 
    you monitor while you make changes to the dataset. For the
    purposes of this project, I chose to take the mean, SD, 
@@ -60,7 +60,7 @@ obliterated.
 
 2) Entropy
    Suggestion for this as a measure of change from Ike Chuang
-   (MIT). Using the e-based definititon. Just a measure of 
+   (MIT). Using the e-based definition. Just a measure of 
    "information." Look at Wikipedia for more info, very simple
    formula.
 
