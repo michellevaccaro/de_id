@@ -1,0 +1,109 @@
+#! /usr/bin/env python
+
+import cPickle, sys, csv
+
+
+def get_gen_map(fname):
+    fin = open(fname, 'rw')
+    gen_map = cPickle.load(fin)
+    fin.close()
+    return gen_map
+
+
+def get_gen_val(f_map, in_val):
+    if(in_val in f_map):
+        val = f_map[in_val][0]
+        return val
+    else:
+        return "FIX"
+
+def get_gen_loc(f_map, in_val):
+    if (in_val in f_map):
+        val = f_map[in_val]
+        return val
+    else:
+        return "FIX"
+
+
+# f_map is course map, in_val is key from csv
+def get_gen_course(f_map, in_val, bin_size):
+    if (bin_size <= 1000):
+        return in_val
+    elif (bin_size <= 5000):
+        return f_map[in_val][0]
+    elif (bin_size <= 10000):
+        return f_map[in_val][1]
+    elif (bin_size <= 15000):
+        return f_map[in_val][2]
+    else:
+        return f_map[in_val][3]
+
+
+if __name__ == '__main__':
+    if len(sys.argv) < 3:
+        print 'Usage: python build_cat_gen_qi_file.py qi_pickle_file_in qi_gen_file_out bin_size'
+        sys.exit(1)
+
+    fin_name = sys.argv[1]
+    fin = open(fin_name, 'rU')
+    qi_in_l = csv.reader(fin)
+
+    fout_name = sys.argv[2]
+
+    bin_size = int(sys.argv[3])
+    loe_map = {};
+    loc_map = {};
+
+    if bin_size == 1000:
+        loe_map = get_gen_map('LOE_generalization1.pkl')
+        loc_map = get_gen_map('postal+city+region_city.pkl')
+    elif bin_size == 5000:
+        loe_map = get_gen_map('LOE_generalization1.pkl')
+        loc_map = get_gen_map('postal+city+region_postalCode.pkl')
+    elif bin_size == 10000:
+        loe_map = get_gen_map('LOE_generalization2.pkl')
+        loc_map = get_gen_map('postal+city+region_subdivision.pkl')
+    elif bin_size == 15000:
+        loe_map = get_gen_map('LOE_generalization2.pkl')
+        loc_map = get_gen_map('postal+city+region_region.pkl')
+    elif bin_size == 20000:
+        loe_map = get_gen_map('LOE_generalization3.pkl')
+        loc_map = get_gen_map('postal+city+regioncountryLabel.pkl')
+    else:
+        loe_map = get_gen_map('LOE_generalization3.pkl')
+        loc_map = get_gen_map('postal+city+regionun_major_region.pkl')
+
+    course_map = get_gen_map('course_id_categories.pkl')
+
+    fout = open(fout_name, 'w')
+    qi_gen_out = csv.writer(fout)
+
+    header = qi_in_l.next()
+    del header[4]
+    del header[3]
+    header[2] = 'Location'
+    qi_gen_out.writerow(header)
+
+    for l in qi_in_l:
+        l[1] = get_gen_course(course_map, l[1], bin_size)
+        l[5] = get_gen_val(loe_map, l[5])
+
+        loc_key = l[3] + "-" + l[4] + "-" + l[2]
+
+        if bin_size == 1000:
+            l[2] = l[3]
+        elif bin_size == 5000:
+            l[2] = l[4]
+        elif bin_size == 15000:
+            l[2] = l[2]
+        elif bin_size == 10000:
+            l[2] = get_gen_loc(loc_map, loc_key)
+        else:
+            l[2] = get_gen_val(loc_map, loc_key)
+
+        del l[4]
+        del l[3]
+        qi_gen_out.writerow(l)
+
+    fout.close()
+    fin.close()
